@@ -127,6 +127,133 @@
             background: #218838;
         }
 
+        .campaign-selector {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .campaign-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .campaign-controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .campaign-controls select {
+            flex: 1;
+            max-width: 400px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .campaign-controls button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-weight: 600;
+        }
+
+        .campaign-controls button.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .campaign-controls button.success:hover {
+            background: #218838;
+        }
+
+        .campaign-controls button.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .campaign-controls button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .campaign-controls button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .campaign-controls button.danger:hover {
+            background: #c82333;
+        }
+
+        .campaign-controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .campaign-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .campaign-info p {
+            margin: 0 0 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .campaign-info span {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .email-management {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .email-management button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-weight: 600;
+        }
+
+        .email-management button.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .email-management button.success:hover {
+            background: #218838;
+        }
+
+        .email-management button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .email-management button.danger:hover {
+            background: #c82333;
+        }
+
         .content {
             padding: 30px;
         }
@@ -366,6 +493,21 @@
             <span class="last-saved" id="lastSaved"></span>
         </div>
 
+        <div class="campaign-selector">
+            <div class="campaign-controls">
+                <label>Campaign:</label>
+                <select id="campaignSelect" onchange="selectCampaign(this.value)"></select>
+                <button onclick="showAddCampaignModal()" class="success">+ Add Campaign</button>
+                <button onclick="editCampaignMetadata()" class="secondary">✏️ Edit</button>
+                <button onclick="deleteCampaign()" class="danger" id="deleteCampaignBtn">🗑️ Delete</button>
+            </div>
+            <div class="campaign-info">
+                <h3 id="campaignTitle"></h3>
+                <p id="campaignDescription"></p>
+                <span id="campaignStats"></span>
+            </div>
+        </div>
+
         <div class="content">
             <div class="info-box cloud" id="cloudStatus">
                 <strong>☁️ Cloud Sync:</strong> <span id="cloudStatusText">Not configured. Click "Cloud Sync Setup" to enable.</span>
@@ -373,6 +515,12 @@
 
             <div class="info-box">
                 <strong>💡 Auto-Save:</strong> All your changes are automatically saved to your browser. Your edits persist even if you close the page.
+            </div>
+
+            <div class="email-management">
+                <button onclick="addEmail()" class="success">+ Add Email</button>
+                <button onclick="deleteEmail()" class="danger" id="deleteEmailBtn">- Delete Email</button>
+                <span class="helper-text">Manage emails in the current campaign</span>
             </div>
 
             <div class="email-selector" id="emailSelector"></div>
@@ -422,6 +570,24 @@
             <div class="modal-actions">
                 <button onclick="closeSetupModal()" class="secondary">Cancel</button>
                 <button onclick="saveSetup()" class="success">Save & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="campaignModal">
+        <div class="modal-content">
+            <h3 id="campaignModalTitle">Create New Campaign</h3>
+            <div class="field-group">
+                <label>Campaign Name</label>
+                <input type="text" id="campaignNameInput" placeholder="e.g., Feature Launch Sequence">
+            </div>
+            <div class="field-group">
+                <label>Description/Notes (Optional)</label>
+                <textarea id="campaignDescInput" placeholder="Campaign purpose, trigger, audience..." style="min-height: 80px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button onclick="closeCampaignModal()" class="secondary">Cancel</button>
+                <button onclick="saveCampaignModal()" class="success" id="saveCampaignBtn">Create</button>
             </div>
         </div>
     </div>
@@ -978,9 +1144,58 @@ Questions? Just reply to this email.`
             }
         ];
 
-        let emailData = [];
-        let currentEmail = 0;
+        // Multi-campaign data structure
+        let campaignsData = { version: "2.0", campaigns: [] };
+        let currentCampaignId = null;
+        let currentEmailIndex = 0;
         let saveTimeout = null;
+
+        // Helper: Get current campaign object
+        function getCurrentCampaign() {
+            if (!currentCampaignId || !campaignsData.campaigns) return null;
+            return campaignsData.campaigns.find(c => c.id === currentCampaignId);
+        }
+
+        // Helper: Generate unique campaign ID
+        function generateCampaignId() {
+            return 'campaign-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Migration: Convert v1 (flat array) to v2 (campaigns structure)
+        function migrateFromV1(data) {
+            // Check if already v2 format
+            if (data && typeof data === 'object' && data.version === "2.0" && Array.isArray(data.campaigns)) {
+                return data;
+            }
+
+            // Check if v1 format (flat array of emails)
+            if (Array.isArray(data)) {
+                console.log('Migrating from v1 to v2 format...');
+                return {
+                    version: "2.0",
+                    campaigns: [{
+                        id: "campaign-1",
+                        name: "Campaign 1: Watch Video Nurture",
+                        description: "Migrated from previous version",
+                        createdAt: new Date().toISOString(),
+                        emails: data
+                    }]
+                };
+            }
+
+            // Unknown format, return default
+            console.warn('Unknown data format, using defaults');
+            return {
+                version: "2.0",
+                campaigns: [{
+                    id: "campaign-1",
+                    name: "Campaign 1: Watch Video Nurture",
+                    description: "28-day nurture sequence for Watch Video form submissions",
+                    createdAt: new Date().toISOString(),
+                    emails: JSON.parse(JSON.stringify(DEFAULT_DATA))
+                }]
+            };
+        }
 
         // GitHub Gist API functions
         async function loadFromGist() {
@@ -1050,11 +1265,13 @@ Questions? Just reply to this email.`
 
         // Initialize data from Gist or localStorage or defaults
         async function initData() {
+            let loadedData = null;
+
             // Try loading from Gist first
             const gistData = await loadFromGist();
 
             if (gistData) {
-                emailData = gistData;
+                loadedData = gistData;
                 console.log('Loaded data from GitHub Gist');
                 updateCloudStatus(true);
             } else {
@@ -1062,16 +1279,22 @@ Questions? Just reply to this email.`
                 const saved = localStorage.getItem('nookEmailCampaign');
                 if (saved) {
                     try {
-                        emailData = JSON.parse(saved);
+                        loadedData = JSON.parse(saved);
                         console.log('Loaded data from localStorage');
                     } catch (e) {
                         console.error('Error loading saved data:', e);
-                        emailData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                        loadedData = null;
                     }
-                } else {
-                    emailData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 }
                 updateCloudStatus(false);
+            }
+
+            // Migrate to v2 format if needed
+            campaignsData = migrateFromV1(loadedData);
+
+            // Set current campaign to first campaign
+            if (campaignsData.campaigns && campaignsData.campaigns.length > 0) {
+                currentCampaignId = campaignsData.campaigns[0].id;
             }
 
             updateLastSaved();
@@ -1087,11 +1310,11 @@ Questions? Just reply to this email.`
 
             saveTimeout = setTimeout(async () => {
                 // Save to localStorage first (immediate)
-                localStorage.setItem('nookEmailCampaign', JSON.stringify(emailData));
+                localStorage.setItem('nookEmailCampaign', JSON.stringify(campaignsData));
                 localStorage.setItem('nookEmailCampaignLastSaved', new Date().toISOString());
 
                 // Save to Gist (background sync)
-                const gistSaved = await saveToGist(emailData);
+                const gistSaved = await saveToGist(campaignsData);
 
                 if (gistSaved) {
                     indicator.textContent = 'Saved to Cloud ✓';
@@ -1127,24 +1350,67 @@ Questions? Just reply to this email.`
             }
         }
 
+        // Render campaign selector dropdown and info
+        function renderCampaigns() {
+            const select = document.getElementById('campaignSelect');
+            const title = document.getElementById('campaignTitle');
+            const description = document.getElementById('campaignDescription');
+            const stats = document.getElementById('campaignStats');
+            const deleteBtn = document.getElementById('deleteCampaignBtn');
+
+            if (!select) return; // UI not ready yet
+
+            // Populate dropdown
+            select.innerHTML = '';
+            campaignsData.campaigns.forEach(campaign => {
+                const option = document.createElement('option');
+                option.value = campaign.id;
+                option.textContent = campaign.name;
+                option.selected = campaign.id === currentCampaignId;
+                select.appendChild(option);
+            });
+
+            // Update campaign info
+            const campaign = getCurrentCampaign();
+            if (campaign) {
+                title.textContent = campaign.name;
+                description.textContent = campaign.description || 'No description';
+                stats.textContent = `${campaign.emails.length} email${campaign.emails.length !== 1 ? 's' : ''}`;
+            }
+
+            // Disable delete if only 1 campaign
+            if (deleteBtn) {
+                deleteBtn.disabled = campaignsData.campaigns.length <= 1;
+            }
+        }
+
+        // Render emails for current campaign
         function renderEmails() {
             const selectorContainer = document.getElementById('emailSelector');
             const emailsContainer = document.getElementById('emailsContainer');
 
+            if (!selectorContainer || !emailsContainer) return;
+
             selectorContainer.innerHTML = '';
             emailsContainer.innerHTML = '';
 
-            emailData.forEach((email, index) => {
+            const campaign = getCurrentCampaign();
+            if (!campaign || !campaign.emails) {
+                emailsContainer.innerHTML = '<p style="padding: 20px;">No emails in this campaign. Click "+ Add Email" to create one.</p>';
+                return;
+            }
+
+            campaign.emails.forEach((email, index) => {
                 // Create selector button
                 const btn = document.createElement('div');
-                btn.className = `email-btn ${index === 0 ? 'active' : ''}`;
+                btn.className = `email-btn ${index === currentEmailIndex ? 'active' : ''}`;
                 btn.onclick = () => selectEmail(index);
                 btn.innerHTML = `Day ${email.day}<br>${email.title.substring(0, 20)}${email.title.length > 20 ? '...' : ''}`;
                 selectorContainer.appendChild(btn);
 
                 // Create email content
                 const emailDiv = document.createElement('div');
-                emailDiv.className = `email-content ${index === 0 ? 'active' : ''}`;
+                emailDiv.className = `email-content ${index === currentEmailIndex ? 'active' : ''}`;
                 emailDiv.id = `email-${index}`;
 
                 emailDiv.innerHTML = `
@@ -1184,8 +1450,16 @@ Questions? Just reply to this email.`
             });
         }
 
+        // Select campaign and render its emails
+        function selectCampaign(campaignId) {
+            currentCampaignId = campaignId;
+            currentEmailIndex = 0;
+            renderCampaigns();
+            renderEmails();
+        }
+
         function selectEmail(index) {
-            currentEmail = index;
+            currentEmailIndex = index;
             document.querySelectorAll('.email-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === index);
             });
@@ -1208,17 +1482,20 @@ Questions? Just reply to this email.`
         }
 
         function updateData(emailIndex, variant, field, value) {
-            emailData[emailIndex].variants[variant][field] = value;
-            saveData();
+            const campaign = getCurrentCampaign();
+            if (campaign && campaign.emails && campaign.emails[emailIndex]) {
+                campaign.emails[emailIndex].variants[variant][field] = value;
+                saveData();
+            }
         }
 
         function saveToFile() {
-            const dataStr = JSON.stringify(emailData, null, 2);
+            const dataStr = JSON.stringify(campaignsData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `nook-campaign-${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `nook-campaigns-${new Date().toISOString().split('T')[0]}.json`;
             link.click();
             URL.revokeObjectURL(url);
         }
@@ -1236,8 +1513,11 @@ Questions? Just reply to this email.`
             const textarea = document.getElementById('importTextarea');
             try {
                 const imported = JSON.parse(textarea.value);
-                emailData = imported;
+                // Migrate if needed
+                campaignsData = migrateFromV1(imported);
+                currentCampaignId = campaignsData.campaigns[0].id;
                 saveData();
+                renderCampaigns();
                 renderEmails();
                 closeImportModal();
                 alert('Data imported successfully!');
@@ -1247,8 +1527,11 @@ Questions? Just reply to this email.`
         }
 
         function copyAllEmails() {
-            let allText = 'NOOK EMAIL CAMPAIGN - WATCH VIDEO NURTURE\n\n';
-            emailData.forEach(email => {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            let allText = `NOOK EMAIL CAMPAIGN - ${campaign.name.toUpperCase()}\n\n`;
+            campaign.emails.forEach(email => {
                 allText += `\n${'='.repeat(60)}\n`;
                 allText += `DAY ${email.day}: ${email.title.toUpperCase()}\n`;
                 allText += `${'='.repeat(60)}\n\n`;
@@ -1262,16 +1545,19 @@ Questions? Just reply to this email.`
             });
 
             navigator.clipboard.writeText(allText).then(() => {
-                alert('All emails copied to clipboard!');
+                alert('Campaign emails copied to clipboard!');
             });
         }
 
         function resetToDefaults() {
-            if (confirm('Reset all emails to default content? This will erase all your changes.')) {
-                emailData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                saveData();
-                renderEmails();
-                alert('Campaign reset to defaults.');
+            if (confirm('Reset current campaign to default content? This will erase all your changes for this campaign.')) {
+                const campaign = getCurrentCampaign();
+                if (campaign) {
+                    campaign.emails = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    saveData();
+                    renderEmails();
+                    alert('Campaign reset to defaults.');
+                }
             }
         }
 
@@ -1316,11 +1602,13 @@ Questions? Just reply to this email.`
                 // Ask user if they want to use cloud data
                 const useCloud = confirm('Cloud data found! Do you want to load it? (Cancel to keep your local data and sync it to cloud)');
                 if (useCloud) {
-                    emailData = gistData;
+                    campaignsData = migrateFromV1(gistData);
+                    currentCampaignId = campaignsData.campaigns[0].id;
+                    renderCampaigns();
                     renderEmails();
                 } else {
                     // Save local data to cloud
-                    await saveToGist(emailData);
+                    await saveToGist(campaignsData);
                 }
                 updateCloudStatus(true);
                 indicator.textContent = 'Cloud sync enabled ✓';
@@ -1331,7 +1619,7 @@ Questions? Just reply to this email.`
                 }, 2000);
             } else {
                 // If no data in gist or error, save current data to gist
-                const saved = await saveToGist(emailData);
+                const saved = await saveToGist(campaignsData);
                 if (saved) {
                     updateCloudStatus(true);
                     indicator.textContent = 'Cloud sync enabled ✓';
@@ -1349,6 +1637,148 @@ Questions? Just reply to this email.`
             }
         }
 
+        // Campaign Management Functions
+        function showAddCampaignModal() {
+            document.getElementById('campaignModalTitle').textContent = 'Create New Campaign';
+            document.getElementById('campaignNameInput').value = '';
+            document.getElementById('campaignDescInput').value = '';
+            document.getElementById('saveCampaignBtn').textContent = 'Create';
+            document.getElementById('saveCampaignBtn').setAttribute('data-mode', 'create');
+            document.getElementById('campaignModal').classList.add('active');
+        }
+
+        function editCampaignMetadata() {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            document.getElementById('campaignModalTitle').textContent = 'Edit Campaign';
+            document.getElementById('campaignNameInput').value = campaign.name;
+            document.getElementById('campaignDescInput').value = campaign.description || '';
+            document.getElementById('saveCampaignBtn').textContent = 'Save';
+            document.getElementById('saveCampaignBtn').setAttribute('data-mode', 'edit');
+            document.getElementById('campaignModal').classList.add('active');
+        }
+
+        function closeCampaignModal() {
+            document.getElementById('campaignModal').classList.remove('active');
+        }
+
+        function saveCampaignModal() {
+            const mode = document.getElementById('saveCampaignBtn').getAttribute('data-mode');
+            const name = document.getElementById('campaignNameInput').value.trim();
+            const description = document.getElementById('campaignDescInput').value.trim();
+
+            if (!name) {
+                alert('Please enter a campaign name');
+                return;
+            }
+
+            if (mode === 'create') {
+                // Create new campaign
+                const newCampaign = {
+                    id: generateCampaignId(),
+                    name: name,
+                    description: description,
+                    createdAt: new Date().toISOString(),
+                    emails: []
+                };
+                campaignsData.campaigns.push(newCampaign);
+                currentCampaignId = newCampaign.id;
+                currentEmailIndex = 0;
+                saveData();
+                renderCampaigns();
+                renderEmails();
+            } else {
+                // Edit existing campaign
+                const campaign = getCurrentCampaign();
+                if (campaign) {
+                    campaign.name = name;
+                    campaign.description = description;
+                    saveData();
+                    renderCampaigns();
+                }
+            }
+
+            closeCampaignModal();
+        }
+
+        function deleteCampaign() {
+            if (campaignsData.campaigns.length <= 1) {
+                alert('Cannot delete the last campaign. You must have at least one campaign.');
+                return;
+            }
+
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            if (confirm(`Delete campaign "${campaign.name}"? This cannot be undone.`)) {
+                const index = campaignsData.campaigns.findIndex(c => c.id === currentCampaignId);
+                campaignsData.campaigns.splice(index, 1);
+
+                // Switch to first campaign
+                currentCampaignId = campaignsData.campaigns[0].id;
+                currentEmailIndex = 0;
+
+                saveData();
+                renderCampaigns();
+                renderEmails();
+            }
+        }
+
+        // Email Management Functions
+        function addEmail() {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            const day = prompt('Enter day number (e.g., 0, 2, 5, 10):');
+            if (day === null) return;
+
+            const title = prompt('Enter email title:');
+            if (!title) {
+                alert('Email title is required');
+                return;
+            }
+
+            const newEmail = {
+                day: parseInt(day) || 0,
+                title: title,
+                variants: {
+                    flooring: { subject: '', preview: '', body: '' },
+                    lighting: { subject: '', preview: '', body: '' },
+                    generic: { subject: '', preview: '', body: '' }
+                }
+            };
+
+            campaign.emails.push(newEmail);
+            saveData();
+            renderEmails();
+        }
+
+        function deleteEmail() {
+            const campaign = getCurrentCampaign();
+            if (!campaign || !campaign.emails) return;
+
+            if (campaign.emails.length === 0) {
+                alert('No emails to delete');
+                return;
+            }
+
+            const email = campaign.emails[currentEmailIndex];
+            if (!email) return;
+
+            if (confirm(`Delete email "Day ${email.day}: ${email.title}"? This cannot be undone.`)) {
+                campaign.emails.splice(currentEmailIndex, 1);
+
+                // Adjust current index if needed
+                if (currentEmailIndex >= campaign.emails.length) {
+                    currentEmailIndex = Math.max(0, campaign.emails.length - 1);
+                }
+
+                saveData();
+                renderEmails();
+            }
+        }
+
         // Close modals on outside click
         document.getElementById('importModal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -1362,8 +1792,15 @@ Questions? Just reply to this email.`
             }
         });
 
+        document.getElementById('campaignModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCampaignModal();
+            }
+        });
+
         // Initialize on page load
         initData().then(() => {
+            renderCampaigns();
             renderEmails();
         });
     </script>
