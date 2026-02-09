@@ -1,31 +1,81 @@
 # Nook Email Campaign Editor
 
-An interactive web-based editor for managing the Nook Watch Video Nurture email campaign (6 emails over 28 days).
+An interactive web-based editor for managing the Nook Watch Video Nurture email campaign (6 emails over 28 days) with **cloud sync** for team collaboration.
 
 ## Features
 
 ✨ **Auto-Save**: All changes automatically saved to browser localStorage
+☁️ **Cloud Sync**: Optional GitHub Gist integration for team sharing (2-5 people)
+🔒 **Password Protection**: StatiCrypt encryption (AES-256)
 📧 **6 Email Sequence**: Days 0, 2, 5, 10, 18, 28
 🎯 **3 Variants**: Flooring, Lighting, Generic
 💾 **Export/Import**: Download and restore campaign data as JSON
 📋 **Copy to Clipboard**: Export all emails as formatted text
 🔄 **Reset**: Restore default content anytime
+💰 **$0/month**: Entirely free hosting and data storage
 
 ## Quick Start
 
-Simply open `index.html` in your browser. No server required!
+### Local Usage (Single User)
+Simply open `index.html` in your browser. No server or setup required!
+
+### Team Usage (2-5 People with Cloud Sync)
+See [SETUP.md](SETUP.md) for complete deployment instructions.
+
+**Quick summary:**
+1. Create GitHub Gist for data storage
+2. Generate GitHub Personal Access Token
+3. Configure cloud sync in the app
+4. Encrypt with StatiCrypt
+5. Deploy to GitHub Pages
+6. Share credentials with team
+
+**Live URL**: https://juandel-12.github.io/nook-email-campaign/
 
 ## How to Use
 
+### Basic Editing
 1. **Navigate**: Click day buttons to switch between emails
 2. **Edit Variants**: Use tabs to switch between Flooring/Lighting/Generic
 3. **Auto-Save**: Changes save automatically to your browser
 4. **Export**: Download your changes as JSON for backup
 5. **Import**: Restore previous versions by importing JSON
 
+### Cloud Sync Setup
+1. Click "⚙️ Cloud Sync Setup" button
+2. Enter your GitHub Personal Access Token (PAT)
+3. Enter your Gist ID
+4. Click "Save & Sync"
+5. Your data now syncs across all team members!
+
+## Architecture
+
+### Components
+- **Frontend**: Single HTML file with embedded CSS/JavaScript
+- **Local Storage**: Browser localStorage for offline editing
+- **Cloud Storage**: GitHub Gist (JSON file) for team collaboration
+- **Password Protection**: StatiCrypt (client-side AES-256 encryption)
+- **Hosting**: GitHub Pages (free static hosting)
+- **API**: GitHub REST API for Gist read/write operations
+
+### Data Flow
+1. User makes edits → Auto-saves to localStorage (immediate)
+2. After 2-second debounce → Syncs to GitHub Gist (cloud)
+3. Other team members refresh → Load latest data from Gist
+4. Offline edits → Save locally, sync when back online
+
+### Cost Breakdown
+- **GitHub Pages**: $0
+- **GitHub Gist**: $0 (5GB limit, unlimited gists)
+- **GitHub API**: $0 (5,000 requests/hour)
+- **StatiCrypt**: $0 (open source)
+- **Total**: **$0/month**
+
 ## Data Persistence
 
 - **Browser Storage**: All edits saved to localStorage (survives browser restarts)
+- **Cloud Storage**: All edits synced to GitHub Gist (shared across team)
+- **Version History**: Gist automatically tracks all changes
 - **JSON Backup**: Export your work to save externally
 - **Import**: Restore from JSON files
 
@@ -54,10 +104,114 @@ Each email has three variants:
 
 ## Technical Details
 
-- Pure HTML/CSS/JavaScript (no dependencies)
-- Works offline after first load
-- Data stored in browser localStorage
+- Pure HTML/CSS/JavaScript (no external dependencies)
+- Works offline with localStorage fallback
+- Cloud sync via GitHub Gist API
+- Password protected with StatiCrypt (AES-256)
 - Compatible with all modern browsers
+- Responsive design (mobile-friendly)
+
+## Security
+
+### Password Protection
+- **StatiCrypt** provides client-side AES-256 encryption
+- Password required to decrypt and access the page
+- Suitable for small trusted teams (2-5 people)
+- **Note**: This is client-side encryption, not enterprise-grade security
+
+### Access Control
+- Single shared password for all team members
+- Single shared GitHub PAT (Personal Access Token) with `gist` scope only
+- Credentials stored in browser localStorage (not in code)
+- Can revoke and regenerate PAT anytime
+
+### Best Practices
+1. Use strong password (12+ characters)
+2. Rotate password every 3-6 months
+3. Share credentials securely (1Password, LastPass, etc.)
+4. Use private/secret Gist for additional privacy
+5. Don't commit credentials to repository
+
+## Project Structure
+
+```
+nook-email-campaign/
+├── index.html                  # Main editor (enhanced with cloud sync)
+├── data/
+│   └── default-campaigns.json  # Default email campaign data
+├── SETUP.md                    # Complete setup & deployment guide
+└── README.md                   # This file
+```
+
+## Files Overview
+
+- **index.html** - Complete email campaign editor with:
+  - GitHub Gist API integration
+  - localStorage caching
+  - Auto-save functionality
+  - Cloud sync configuration UI
+  - Import/export features
+
+- **data/default-campaigns.json** - Default campaign structure:
+  - 6 emails (Days 0, 2, 5, 10, 18, 28)
+  - 3 variants per email (Flooring, Lighting, Generic)
+  - Used to initialize new Gists
+
+- **SETUP.md** - Step-by-step deployment guide:
+  - Creating GitHub Gist
+  - Generating Personal Access Token
+  - Configuring cloud sync
+  - Encrypting with StatiCrypt
+  - Deploying to GitHub Pages
+  - Troubleshooting tips
+
+## Deployment
+
+See [SETUP.md](SETUP.md) for complete deployment instructions.
+
+**Quick Deploy:**
+```bash
+# 1. Install StatiCrypt
+npm install -g staticrypt
+
+# 2. Encrypt HTML file
+staticrypt index.html \
+  --password "YOUR_PASSWORD" \
+  --title "Nook Email Campaign Editor" \
+  --instructions "Enter the team password to access the editor" \
+  --output index.encrypted.html
+
+# 3. Deploy to GitHub Pages
+cp index.encrypted.html index.html
+git add index.html
+git commit -m "Deploy encrypted editor"
+git push origin main
+```
+
+## Troubleshooting
+
+### Cloud Sync Not Working
+- Verify GitHub PAT has `gist` scope at https://github.com/settings/tokens
+- Verify Gist ID is correct
+- Check browser console (F12) for error messages
+- Ensure internet connection is active
+
+### Password Forgotten
+- Re-encrypt `index.html` with new password using StatiCrypt
+- Redeploy to GitHub Pages
+- Share new password with team
+
+### Changes Not Syncing to Team
+- All team members must use same Gist ID
+- Team members need to refresh page to see updates
+- Last save wins (no complex merge logic)
+- Export/import JSON for manual sync if needed
+
+## Support
+
+- **Setup Guide**: See [SETUP.md](SETUP.md)
+- **GitHub Issues**: Report bugs or feature requests
+- **Gist Verification**: Check https://gist.github.com/{username}/{GIST_ID} directly
 
 ## License
 
