@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
-import Input from './Input';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import Button from './Button';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './SetupModal.module.css';
@@ -25,31 +26,43 @@ const SetupModal = ({ isOpen, onClose }) => {
           Connect your GitHub Gist to enable cloud synchronization across your team.
         </p>
 
-        <Input
-          label="GitHub Gist ID"
-          type="text"
-          value={gistId}
-          onChange={(e) => setGistId(e.target.value)}
-          placeholder="abc123def456..."
-          helperText="Create a private Gist on GitHub and paste its ID here"
-        />
+        <div className="space-y-4">
+          <div className="grid w-full gap-2">
+            <Label htmlFor="gist-id">GitHub Gist ID</Label>
+            <Input
+              id="gist-id"
+              type="text"
+              value={gistId}
+              onChange={(e) => setGistId(e.target.value)}
+              placeholder="abc123def456..."
+            />
+            <p className="text-sm text-muted-foreground">
+              Create a private Gist on GitHub and paste its ID here
+            </p>
+          </div>
 
-        <Input
-          label="GitHub Personal Access Token"
-          type="password"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          placeholder="ghp_xxxxxxxxxxxx"
-          helperText="Create a token with 'gist' scope at github.com/settings/tokens"
-        />
+          <div className="grid w-full gap-2">
+            <Label htmlFor="github-token">GitHub Personal Access Token</Label>
+            <Input
+              id="github-token"
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="ghp_xxxxxxxxxxxx"
+            />
+            <p className="text-sm text-muted-foreground">
+              Create a token with 'gist' scope at github.com/settings/tokens
+            </p>
+          </div>
 
-        <div className={styles.actions}>
-          <Button variant="secondary" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Configuration
-          </Button>
+          <div className={styles.actions}>
+            <Button variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSave}>
+              Save Configuration
+            </Button>
+          </div>
         </div>
 
         <div className={styles.instructions}>

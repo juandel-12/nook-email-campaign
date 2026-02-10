@@ -1,6 +1,7 @@
 import React from 'react';
-import Input from './Input';
-import Textarea from './Textarea';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
 import { useCampaignContext } from '../contexts/CampaignContext';
 
 const VariantForm = ({ campaignId, emailIndex, variant }) => {
@@ -17,32 +18,46 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   };
 
   return (
-    <div>
-      <Input
-        label="Subject Line"
-        value={variantData.subject}
-        onChange={(e) => handleChange('subject', e.target.value)}
-        placeholder="Email subject line"
-        helperText="This appears in the inbox as the email subject"
-      />
+    <div className="space-y-6">
+      <div className="grid w-full gap-3">
+        <Label htmlFor="subject">Subject Line</Label>
+        <Input
+          id="subject"
+          value={variantData.subject}
+          onChange={(e) => handleChange('subject', e.target.value)}
+          placeholder="Email subject line"
+        />
+        <p className="text-sm text-muted-foreground">
+          This appears in the inbox as the email subject
+        </p>
+      </div>
 
-      <Input
-        label="Preview Text"
-        value={variantData.preview}
-        onChange={(e) => handleChange('preview', e.target.value)}
-        placeholder="Inbox preview text"
-        helperText="Text shown next to the subject in the inbox"
-      />
+      <div className="grid w-full gap-3">
+        <Label htmlFor="preview">Preview Text</Label>
+        <Input
+          id="preview"
+          value={variantData.preview}
+          onChange={(e) => handleChange('preview', e.target.value)}
+          placeholder="Inbox preview text"
+        />
+        <p className="text-sm text-muted-foreground">
+          Text shown next to the subject in the inbox
+        </p>
+      </div>
 
-      <Textarea
-        label="Email Body"
-        value={variantData.body}
-        onChange={(e) => handleChange('body', e.target.value)}
-        placeholder="Email content goes here..."
-        minHeight="300px"
-        monospace
-        helperText="Use {{First_Name}} for personalization. Supports basic formatting."
-      />
+      <div className="grid w-full gap-3">
+        <Label htmlFor="body">Email Body</Label>
+        <Textarea
+          id="body"
+          value={variantData.body}
+          onChange={(e) => handleChange('body', e.target.value)}
+          placeholder="Email content goes here..."
+          className="min-h-[300px] font-mono"
+        />
+        <p className="text-sm text-muted-foreground">
+          Use {'{'}'{'}First_Name{'}'}{'}'}  for personalization. Supports basic formatting.
+        </p>
+      </div>
     </div>
   );
 };

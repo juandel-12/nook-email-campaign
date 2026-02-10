@@ -193,6 +193,41 @@ export const CampaignProvider = ({ children }) => {
     }
   }, [currentEmailIndex]);
 
+  const duplicateEmail = useCallback((campaignId, emailIndex) => {
+    const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
+    if (!campaign || !campaign.emails[emailIndex]) return;
+
+    const emailToDuplicate = campaign.emails[emailIndex];
+    const duplicatedEmail = {
+      ...emailToDuplicate,
+      title: `${emailToDuplicate.title} (Copy)`,
+      variants: {
+        flooring: { ...emailToDuplicate.variants.flooring },
+        lighting: { ...emailToDuplicate.variants.lighting },
+        generic: { ...emailToDuplicate.variants.generic }
+      }
+    };
+
+    setCampaignsData(prev => ({
+      ...prev,
+      campaigns: prev.campaigns.map(c =>
+        c.id === campaignId
+          ? {
+              ...c,
+              emails: [
+                ...c.emails.slice(0, emailIndex + 1),
+                duplicatedEmail,
+                ...c.emails.slice(emailIndex + 1)
+              ]
+            }
+          : c
+      )
+    }));
+
+    // Select the newly duplicated email
+    setCurrentEmailIndex(emailIndex + 1);
+  }, [campaignsData.campaigns]);
+
   const updateEmail = useCallback((campaignId, emailIndex, variant, field, value) => {
     setCampaignsData(prev => ({
       ...prev,
@@ -305,6 +340,7 @@ export const CampaignProvider = ({ children }) => {
     selectEmail,
     addEmail,
     deleteEmail,
+    duplicateEmail,
     updateEmail,
     updateEmailMeta,
     setCurrentVariant,

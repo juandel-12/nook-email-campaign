@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import Input from './Input';
-import Textarea from './Textarea';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
 import Button from './Button';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './CampaignModal.module.css';
@@ -57,30 +58,38 @@ const CampaignModal = ({ isOpen, onClose, editCampaignId = null }) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={title}>
       <div className={styles.campaignModal}>
-        <Input
-          label="Campaign Name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g., Watch Video Nurture"
-          required
-        />
+        <div className="space-y-4">
+          <div className="grid w-full gap-2">
+            <Label htmlFor="campaign-name">Campaign Name</Label>
+            <Input
+              id="campaign-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Watch Video Nurture"
+              required
+            />
+          </div>
 
-        <Textarea
-          label="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Brief description of this campaign's purpose"
-          minHeight="100px"
-        />
+          <div className="grid w-full gap-2">
+            <Label htmlFor="campaign-description">Description</Label>
+            <Textarea
+              id="campaign-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description of this campaign's purpose"
+              className="min-h-[100px]"
+            />
+          </div>
 
-        <div className={styles.actions}>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            {isEdit ? 'Update Campaign' : 'Create Campaign'}
-          </Button>
+          <div className={styles.actions}>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSave}>
+              {isEdit ? 'Update Campaign' : 'Create Campaign'}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

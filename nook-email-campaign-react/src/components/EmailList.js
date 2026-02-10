@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Button from './Button';
 import Modal from './Modal';
-import Input from './Input';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './EmailList.module.css';
 
@@ -62,38 +63,46 @@ const EmailList = ({ campaignId }) => {
         }}
         title="Add New Email"
       >
-        <Input
-          label="Day Number"
-          type="number"
-          value={newDay}
-          onChange={(e) => setNewDay(e.target.value)}
-          placeholder="0"
-          required
-        />
+        <div className="space-y-4">
+          <div className="grid w-full gap-2">
+            <Label htmlFor="day-number">Day Number</Label>
+            <Input
+              id="day-number"
+              type="number"
+              value={newDay}
+              onChange={(e) => setNewDay(e.target.value)}
+              placeholder="0"
+              required
+            />
+          </div>
 
-        <Input
-          label="Email Title"
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="e.g., Your Nook video is ready"
-          required
-        />
+          <div className="grid w-full gap-2">
+            <Label htmlFor="email-title">Email Title</Label>
+            <Input
+              id="email-title"
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="e.g., Your Nook video is ready"
+              required
+            />
+          </div>
 
-        <div className={styles.modalActions}>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setShowAddModal(false);
-              setNewDay('');
-              setNewTitle('');
-            }}
-          >
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleAddEmail}>
-            Add Email
-          </Button>
+          <div className={styles.modalActions}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowAddModal(false);
+                setNewDay('');
+                setNewTitle('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleAddEmail}>
+              Add Email
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>
