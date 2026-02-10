@@ -615,8 +615,8 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
 
           <p className="text-sm text-muted-foreground">
             {bodyMode === 'visual'
-              ? 'Use the formatting buttons above or type/paste formatted text. Variables like %FIRSTNAME% will be replaced.'
-              : 'Use HTML tags for formatting. Variables like %FIRSTNAME% will be replaced.'
+              ? 'Use the formatting buttons above or type/paste formatted text. Variables like %FIRSTNAME% will remain as-is for ActiveCampaign.'
+              : 'Use HTML tags for formatting. Variables like %FIRSTNAME% will remain as-is for ActiveCampaign.'
             }
           </p>
         </div>
@@ -667,7 +667,7 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
               />
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Preview updates automatically as you type. Template variables like %FIRSTNAME% are replaced with placeholder values.
+              Preview updates automatically as you type. ActiveCampaign variables like %FIRSTNAME% remain as-is in the output.
             </p>
           </TabsContent>
 

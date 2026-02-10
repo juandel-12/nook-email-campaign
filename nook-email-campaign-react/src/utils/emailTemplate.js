@@ -250,12 +250,10 @@ export function renderEmailTemplate(template, emailData, variant) {
   const variantData = emailData.variants[variant];
 
   // Prepare substitutions (HTML formatting preserved in body)
+  // Note: ActiveCampaign variables like %FIRSTNAME%, %%VIDEO_URL%%, etc. are left as-is
   const substitutions = {
     '{{PREVIEW_TEXT}}': escapeHtml(variantData.preview || ''),
-    '{{EMAIL_BODY}}': nl2br(variantData.body || ''), // Allows HTML formatting
-    '%FIRSTNAME%': 'there', // Placeholder for preview
-    '%%VIDEO_URL%%': '#', // Placeholder for preview
-    '%UNSUBSCRIBELINK%': '#' // Placeholder for preview
+    '{{EMAIL_BODY}}': nl2br(variantData.body || '') // Allows HTML formatting
   };
 
   // Apply all substitutions
@@ -286,12 +284,10 @@ export function renderEmailTemplateRaw(template, emailData, variant) {
   const variantData = emailData.variants[variant];
 
   // Prepare substitutions (HTML formatting preserved in body)
+  // Note: ActiveCampaign variables like %FIRSTNAME%, %%VIDEO_URL%%, etc. are left as-is
   const substitutions = {
     '{{PREVIEW_TEXT}}': escapeHtml(variantData.preview || ''),
-    '{{EMAIL_BODY}}': nl2br(variantData.body || ''), // Allows HTML formatting
-    '%FIRSTNAME%': 'there', // Placeholder for preview
-    '%%VIDEO_URL%%': '#', // Placeholder for preview
-    '%UNSUBSCRIBELINK%': '#' // Placeholder for preview
+    '{{EMAIL_BODY}}': nl2br(variantData.body || '') // Allows HTML formatting
   };
 
   // Apply all substitutions
