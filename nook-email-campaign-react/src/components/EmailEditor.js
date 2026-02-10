@@ -5,9 +5,11 @@ import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './EmailEditor.module.css';
 
 const EmailEditor = () => {
-  const { currentCampaignId, currentEmailIndex, getCurrentCampaign } = useCampaignContext();
+  const { campaignsData, currentCampaignId, currentEmailIndex, getCurrentCampaign } = useCampaignContext();
 
   const campaign = getCurrentCampaign();
+
+  console.log('EmailEditor render - campaign emails:', campaign?.emails.map(e => `Day ${e.day}`));
 
   if (!currentCampaignId || !campaign) {
     return (

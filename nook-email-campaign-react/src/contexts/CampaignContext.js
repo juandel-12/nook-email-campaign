@@ -256,21 +256,26 @@ export const CampaignProvider = ({ children }) => {
   }, []);
 
   const updateEmailMeta = useCallback((campaignId, emailIndex, field, value) => {
-    setCampaignsData(prev => ({
-      ...prev,
-      campaigns: prev.campaigns.map(c =>
-        c.id === campaignId
-          ? {
-              ...c,
-              emails: c.emails.map((email, i) =>
-                i === emailIndex
-                  ? { ...email, [field]: field === 'day' ? parseInt(value, 10) : value }
-                  : email
-              )
-            }
-          : c
-      )
-    }));
+    console.log(`updateEmailMeta called: index=${emailIndex}, field=${field}, value=${value}`);
+    setCampaignsData(prev => {
+      const updated = {
+        ...prev,
+        campaigns: prev.campaigns.map(c =>
+          c.id === campaignId
+            ? {
+                ...c,
+                emails: c.emails.map((email, i) =>
+                  i === emailIndex
+                    ? { ...email, [field]: field === 'day' ? parseInt(value, 10) : value }
+                    : email
+                )
+              }
+            : c
+        )
+      };
+      console.log('Updated campaignsData:', updated);
+      return updated;
+    });
   }, []);
 
   // Data import/export

@@ -15,6 +15,19 @@ const EmailList = ({ campaignId }) => {
   const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
   if (!campaign) return null;
 
+  // Sort emails by day number for display, but keep track of original indices
+  // Sorts on every render to ensure real-time updates when day numbers change
+  const sortedEmailsWithIndices = campaign.emails
+    .map((email, originalIndex) => ({ email, originalIndex }))
+    .sort((a, b) => {
+      const dayA = parseInt(a.email.day, 10);
+      const dayB = parseInt(b.email.day, 10);
+      return dayA - dayB;
+    });
+
+  // Debug logging
+  console.log('EmailList render - sorted days:', sortedEmailsWithIndices.map(e => `Day ${e.email.day}`));
+
   const handleAddEmail = () => {
     if (!newDay.trim() || !newTitle.trim()) {
       alert('Please fill in both day number and title');
@@ -36,11 +49,11 @@ const EmailList = ({ campaignId }) => {
       </div>
 
       <div className={styles.emailSelector}>
-        {campaign.emails.map((email, index) => (
+        {sortedEmailsWithIndices.map(({ email, originalIndex }) => (
           <button
-            key={index}
-            className={`${styles.emailBtn} ${currentEmailIndex === index ? styles.active : ''}`}
-            onClick={() => selectEmail(index)}
+            key={originalIndex}
+            className={`${styles.emailBtn} ${currentEmailIndex === originalIndex ? styles.active : ''}`}
+            onClick={() => selectEmail(originalIndex)}
           >
             <div className={styles.day}>Day {email.day}</div>
             <div className={styles.title}>{email.title}</div>
