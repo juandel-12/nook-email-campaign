@@ -7,7 +7,7 @@ import { Separator } from './ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { renderEmailTemplate, renderEmailTemplateRaw } from '../utils/emailTemplate';
-import { Copy, Check, Bold, Italic, Link as LinkIcon, Code, Undo, Redo, Variable } from 'lucide-react';
+import { Copy, Check, Bold, Italic, Underline, Link as LinkIcon, Code, Undo, Redo, Variable } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 import {
   DropdownMenu,
@@ -334,6 +334,18 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
     }
   };
 
+  const handleUnderline = () => {
+    if (bodyMode === 'visual') {
+      document.execCommand('underline', false, null);
+      const contentDiv = contentEditableRef.current;
+      if (contentDiv) {
+        handleChange('body', contentDiv.innerHTML);
+      }
+    } else {
+      insertFormatting('<u>', '</u>');
+    }
+  };
+
   const handleLink = () => {
     const url = prompt('Enter URL:');
     if (url) {
@@ -516,6 +528,15 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
               title="Italic"
             >
               <Italic className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleUnderline}
+              title="Underline"
+            >
+              <Underline className="w-4 h-4" />
             </Button>
             <Button
               type="button"
