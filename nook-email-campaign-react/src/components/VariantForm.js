@@ -7,8 +7,16 @@ import { Separator } from './ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { renderEmailTemplate, renderEmailTemplateRaw } from '../utils/emailTemplate';
-import { Copy, Check, Bold, Italic, Link as LinkIcon, Code, Undo, Redo } from 'lucide-react';
+import { Copy, Check, Bold, Italic, Link as LinkIcon, Code, Undo, Redo, Variable } from 'lucide-react';
 import ColorPicker from './ColorPicker';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const VariantForm = ({ campaignId, emailIndex, variant }) => {
   const { campaignsData, config, updateEmail } = useCampaignContext();
@@ -353,6 +361,18 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
     }
   };
 
+  const handleInsertVariable = (variable) => {
+    if (bodyMode === 'visual') {
+      document.execCommand('insertText', false, variable);
+      const contentDiv = contentEditableRef.current;
+      if (contentDiv) {
+        handleChange('body', contentDiv.innerHTML);
+      }
+    } else {
+      insertFormatting(variable);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left column: Form fields */}
@@ -507,6 +527,59 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
               <LinkIcon className="w-4 h-4" />
             </Button>
             <ColorPicker onSelectColor={handleColor} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  title="Insert Variable"
+                >
+                  <Variable className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>Contact Fields</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%FIRSTNAME%')}>
+                  <span className="font-mono text-xs">%FIRSTNAME%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">First Name</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%LASTNAME%')}>
+                  <span className="font-mono text-xs">%LASTNAME%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Last Name</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%EMAIL%')}>
+                  <span className="font-mono text-xs">%EMAIL%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Email</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%PHONE%')}>
+                  <span className="font-mono text-xs">%PHONE%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Phone</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Custom Fields</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%COMPANY%')}>
+                  <span className="font-mono text-xs">%COMPANY%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Company</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%JOBTITLE%')}>
+                  <span className="font-mono text-xs">%JOBTITLE%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Job Title</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Campaign</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%%VIDEO_URL%%')}>
+                  <span className="font-mono text-xs">%%VIDEO_URL%%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Video URL</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>System</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleInsertVariable('%UNSUBSCRIBELINK%')}>
+                  <span className="font-mono text-xs">%UNSUBSCRIBELINK%</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Unsubscribe</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Separator orientation="vertical" className="h-8" />
             <Button
               type="button"

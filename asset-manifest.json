@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/nook-email-campaign/static/css/main.a0ce17ad.css",
-    "main.js": "/nook-email-campaign/static/js/main.5f4f47f8.js",
+    "main.css": "/nook-email-campaign/static/css/main.66822f18.css",
+    "main.js": "/nook-email-campaign/static/js/main.db2c927b.js",
     "static/js/453.a9301d22.chunk.js": "/nook-email-campaign/static/js/453.a9301d22.chunk.js",
     "index.html": "/nook-email-campaign/index.html",
-    "main.a0ce17ad.css.map": "/nook-email-campaign/static/css/main.a0ce17ad.css.map",
-    "main.5f4f47f8.js.map": "/nook-email-campaign/static/js/main.5f4f47f8.js.map",
+    "main.66822f18.css.map": "/nook-email-campaign/static/css/main.66822f18.css.map",
+    "main.db2c927b.js.map": "/nook-email-campaign/static/js/main.db2c927b.js.map",
     "453.a9301d22.chunk.js.map": "/nook-email-campaign/static/js/453.a9301d22.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a0ce17ad.css",
-    "static/js/main.5f4f47f8.js"
+    "static/css/main.66822f18.css",
+    "static/js/main.db2c927b.js"
   ]
 }
