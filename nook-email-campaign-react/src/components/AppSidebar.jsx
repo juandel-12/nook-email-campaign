@@ -85,11 +85,14 @@ export function AppSidebar({
                   </SidebarMenuButton>
                   {campaign.id === currentCampaignId && campaign.emails?.length > 0 && (
                     <SidebarMenuSub>
-                      {campaign.emails.map((email, index) => (
-                        <SidebarMenuSubItem key={index}>
+                      {campaign.emails
+                        .map((email, originalIndex) => ({ email, originalIndex }))
+                        .sort((a, b) => parseInt(a.email.day, 10) - parseInt(b.email.day, 10))
+                        .map(({ email, originalIndex }) => (
+                        <SidebarMenuSubItem key={originalIndex}>
                           <SidebarMenuSubButton
-                            onClick={() => selectEmail(index)}
-                            isActive={index === currentEmailIndex}
+                            onClick={() => selectEmail(originalIndex)}
+                            isActive={originalIndex === currentEmailIndex}
                             className="h-auto min-h-7 py-1.5 items-start whitespace-normal overflow-visible [&>span:last-child]:whitespace-normal [&>span:last-child]:break-words"
                           >
                             <span className="text-xs text-muted-foreground mr-2 flex-shrink-0 mt-0.5">{email.day}</span>
