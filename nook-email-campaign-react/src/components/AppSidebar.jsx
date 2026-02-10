@@ -56,7 +56,7 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="flex-1 overflow-hidden">
           <div className="flex items-center justify-between px-2">
             <SidebarGroupLabel>Campaigns</SidebarGroupLabel>
             <Button
@@ -69,7 +69,7 @@ export function AppSidebar({
               <span className="sr-only">Add campaign</span>
             </Button>
           </div>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="overflow-y-auto max-h-[calc(100vh-200px)]">
             <SidebarMenu>
               {campaignsData.campaigns.map((campaign) => (
                 <SidebarMenuItem key={campaign.id}>
@@ -90,9 +90,10 @@ export function AppSidebar({
                           <SidebarMenuSubButton
                             onClick={() => selectEmail(index)}
                             isActive={index === currentEmailIndex}
+                            className="h-auto min-h-7 py-1.5 items-start whitespace-normal overflow-visible [&>span:last-child]:whitespace-normal [&>span:last-child]:break-words"
                           >
-                            <span className="text-xs text-muted-foreground mr-2">Day {email.day}</span>
-                            {email.title}
+                            <span className="text-xs text-muted-foreground mr-2 flex-shrink-0 mt-0.5">{email.day}</span>
+                            <span className="flex-1 whitespace-normal break-words">{email.title}</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -103,7 +104,9 @@ export function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+      </SidebarContent>
 
+      <SidebarFooter>
         <SidebarGroup>
           <SidebarGroupLabel>Actions</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -141,9 +144,6 @@ export function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>

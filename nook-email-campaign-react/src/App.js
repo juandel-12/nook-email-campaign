@@ -102,12 +102,12 @@ const AppContent = () => {
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <div className="flex-1">
-              {campaign && currentEmail && (
+              {campaign && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{campaign.name}</span>
                   <Separator orientation="vertical" className="h-4" />
                   <span className="text-sm text-muted-foreground">
-                    Day {currentEmail.day}: {currentEmail.title}
+                    {campaign.description}
                   </span>
                 </div>
               )}
@@ -132,6 +132,14 @@ const AppContent = () => {
             </div>
           </div>
         </header>
+
+        {campaign && currentEmail && (
+          <div className="border-b bg-muted/30 px-4 py-3">
+            <h3 className="text-lg font-semibold">
+              Day {currentEmail.day}: {currentEmail.title}
+            </h3>
+          </div>
+        )}
 
         <div className="flex flex-1 flex-col gap-4 p-4">
           {!campaign && (
