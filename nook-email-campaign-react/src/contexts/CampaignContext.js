@@ -6,6 +6,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import defaultCampaignsData from '../data/defaultCampaigns.json';
 import { ensureV2Format } from '../utils/migrate';
+import { DEFAULT_EMAIL_TEMPLATE } from '../utils/emailTemplate';
 
 const CampaignContext = createContext();
 
@@ -14,6 +15,7 @@ const STORAGE_KEY = 'nookEmailCampaign';
 const LAST_SAVED_KEY = 'nookEmailCampaignLastSaved';
 const TOKEN_KEY = 'githubToken';
 const GIST_ID_KEY = 'gistId';
+const HTML_TEMPLATE_KEY = 'htmlEmailTemplate';
 
 export const CampaignProvider = ({ children }) => {
   // Core data state
@@ -26,6 +28,7 @@ export const CampaignProvider = ({ children }) => {
   const [config, setConfig] = useState({
     gistId: localStorage.getItem(GIST_ID_KEY) || '',
     githubToken: localStorage.getItem(TOKEN_KEY) || '',
+    htmlTemplate: localStorage.getItem(HTML_TEMPLATE_KEY) || DEFAULT_EMAIL_TEMPLATE,
     saveDebounce: 2000
   });
 
@@ -322,10 +325,22 @@ export const CampaignProvider = ({ children }) => {
       if (newConfig.githubToken !== undefined) {
         localStorage.setItem(TOKEN_KEY, newConfig.githubToken);
       }
+      if (newConfig.htmlTemplate !== undefined) {
+        localStorage.setItem(HTML_TEMPLATE_KEY, newConfig.htmlTemplate);
+      }
 
       return updated;
     });
   }, []);
+
+  // HTML template management
+  const updateHtmlTemplate = useCallback((newTemplate) => {
+    updateConfig({ htmlTemplate: newTemplate });
+  }, [updateConfig]);
+
+  const resetHtmlTemplate = useCallback(() => {
+    updateConfig({ htmlTemplate: DEFAULT_EMAIL_TEMPLATE });
+  }, [updateConfig]);
 
   const value = {
     // Data
@@ -358,6 +373,8 @@ export const CampaignProvider = ({ children }) => {
     // Config
     config,
     updateConfig,
+    updateHtmlTemplate,
+    resetHtmlTemplate,
 
     // Status
     saveStatus,
