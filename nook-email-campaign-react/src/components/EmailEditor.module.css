@@ -1,0 +1,22 @@
+.content {
+  padding: 30px;
+}
+
+.emptyState,
+.noEmails {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.emptyState h2 {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 24px;
+}
+
+.emptyState p,
+.noEmails p {
+  margin: 0;
+  font-size: 16px;
+}

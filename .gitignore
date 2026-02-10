@@ -1,2 +1,4 @@
 ._*
 .DS_Store
+# Keep Claude Code configuration
+# .claude/agents/ is tracked (we want agents in Git)

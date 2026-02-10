@@ -1,0 +1,86 @@
+.importModal {
+  /* Container styles if needed */
+}
+
+.description {
+  margin-bottom: 20px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.fileUpload {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.fileLabel {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #667eea;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.fileLabel:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileHint {
+  font-size: 13px;
+  color: #999;
+  font-style: italic;
+}
+
+.textareaWrapper {
+  margin-bottom: 15px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.error {
+  padding: 12px;
+  background: #ffe6e6;
+  border: 1px solid #ffcccc;
+  border-radius: 6px;
+  color: #c82333;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}

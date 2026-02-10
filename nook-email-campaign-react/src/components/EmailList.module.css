@@ -1,0 +1,73 @@
+.emailListContainer {
+  margin-bottom: 30px;
+}
+
+.emailManagement {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.emailSelector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.emailBtn {
+  padding: 12px;
+  background: #f0f0f0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.emailBtn:hover {
+  background: #e8e8e8;
+}
+
+.emailBtn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.day {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.title {
+  font-size: 13px;
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  padding: 40px;
+  text-align: center;
+  color: #999;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}

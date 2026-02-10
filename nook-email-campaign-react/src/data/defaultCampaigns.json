@@ -1,0 +1,139 @@
+{
+  "version": "2.0",
+  "campaigns": [
+    {
+      "id": "campaign-default",
+      "name": "Watch Video Nurture",
+      "description": "6-email nurture sequence for video requests",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "emails": [
+        {
+          "day": 0,
+          "title": "Your Nook video is ready",
+          "variants": {
+            "flooring": {
+              "subject": "Your Nook video is ready",
+              "preview": "See how flooring teams turn website visitors into ready-to-buy customers",
+              "body": "Hi {{First_Name}},\n\nThanks for requesting a Nook video. Here it is:\n\n[VIDEO THUMBNAIL - Flooring interface with hardwood/LVP/tile options visible]\n\n[BUTTON: Watch Video]\n\nYou'll see how flooring teams capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.\n\nThe video is about 2 minutes. Let me know if you have questions after watching.\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "Your Nook video is ready",
+              "preview": "See how lighting teams turn website visitors into ready-to-buy customers",
+              "body": "Hi {{First_Name}},\n\nThanks for requesting a Nook video. Here it is:\n\n[VIDEO THUMBNAIL - Lighting interface with chandelier/pendant/recessed options visible]\n\n[BUTTON: Watch Video]\n\nYou'll see how lighting teams capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.\n\nThe video is about 2 minutes. Let me know if you have questions after watching.\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "Your Nook video is ready",
+              "preview": "See how home improvement teams turn website visitors into ready-to-buy customers",
+              "body": "Hi {{First_Name}},\n\nThanks for requesting a Nook video. Here it is:\n\n[VIDEO THUMBNAIL - Generic home improvement interface]\n\n[BUTTON: Watch Video]\n\nYou'll see how home improvement retailers capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.\n\nThe video is about 2 minutes. Let me know if you have questions after watching.\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        },
+        {
+          "day": 2,
+          "title": "What you'll see inside Nook",
+          "variants": {
+            "flooring": {
+              "subject": "What you'll see inside Nook",
+              "preview": "High-context leads, guided planning, and a shared workspace",
+              "body": "Hi {{First_Name}},\n\nDid you get a chance to watch the video?\n\nIf not, here's what you'll see:\n\n[THREE-PANEL IMAGE: (1) lead capture form with room details, (2) flooring material selection grid, (3) shared workspace]\n\n1. High-context leads — Your website visitors tell you square footage, room type, material preferences (hardwood, LVP, tile, carpet), and style direction before the first call.\n\n2. Guided planning experience — Shoppers build a plan on your site, narrowing options and clarifying what they want. They show up ready to buy, not just browse.\n\n3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.\n\n[BUTTON: Watch the Video]\n\nOr if you'd rather see it yourself:\n[LINK: Try a Sample Flooring Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "What you'll see inside Nook",
+              "preview": "High-context leads, guided planning, and a shared workspace",
+              "body": "Hi {{First_Name}},\n\nDid you get a chance to watch the video?\n\nIf not, here's what you'll see:\n\n[THREE-PANEL IMAGE: (1) lead capture form with room details, (2) lighting fixture selection grid, (3) shared workspace]\n\n1. High-context leads — Your website visitors tell you room type, fixture preferences (chandeliers, pendants, recessed, sconces), style direction, and budget signals before the first call.\n\n2. Guided planning experience — Shoppers build a plan on your site, exploring fixtures and visualizing how they fit their space. They show up ready to buy, not just browse.\n\n3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.\n\n[BUTTON: Watch the Video]\n\nOr if you'd rather see it yourself:\n[LINK: Try a Sample Lighting Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "What you'll see inside Nook",
+              "preview": "High-context leads, guided planning, and a shared workspace",
+              "body": "Hi {{First_Name}},\n\nDid you get a chance to watch the video?\n\nIf not, here's what you'll see:\n\n[THREE-PANEL IMAGE: (1) lead capture form, (2) product selection interface, (3) shared workspace]\n\n1. High-context leads — Your website visitors tell you project details, product preferences, style direction, and budget signals before the first call.\n\n2. Guided planning experience — Shoppers build a plan on your site, narrowing options and clarifying what they want. They show up ready to buy, not just browse.\n\n3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.\n\n[BUTTON: Watch the Video]\n\nOr if you'd rather see it yourself:\n[LINK: Try a Sample Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        },
+        {
+          "day": 5,
+          "title": "Why \"name + phone\" leads cost you sales",
+          "variants": {
+            "flooring": {
+              "subject": "Why \"name + phone\" leads cost you sales",
+              "preview": "The hidden cost of low-context leads",
+              "body": "Hi {{First_Name}},\n\nHere's what happens with a typical flooring lead:\n\n[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]\n\nYour rep calls back and asks, \"What were you looking for?\"\n\nThe customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.\n\nWith Nook, your team already knows:\n\n→ What room they're planning\n→ Square footage\n→ Material type (hardwood, LVP, tile, carpet)\n→ Style preferences\n→ Budget signals\n\nYour first conversation picks up where the website left off. No starting from scratch.\n\n[BUTTON: See How Nook Captures Leads]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "Why \"name + phone\" leads cost you sales",
+              "preview": "The hidden cost of low-context leads",
+              "body": "Hi {{First_Name}},\n\nHere's what happens with a typical lighting lead:\n\n[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]\n\nYour rep calls back and asks, \"What were you looking for?\"\n\nThe customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.\n\nWith Nook, your team already knows:\n\n→ Which rooms they're planning\n→ Fixture types they're considering\n→ Style direction (modern, traditional, transitional)\n→ Budget range\n\nYour first conversation picks up where the website left off. No starting from scratch.\n\n[BUTTON: See How Nook Captures Leads]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "Why \"name + phone\" leads cost you sales",
+              "preview": "The hidden cost of low-context leads",
+              "body": "Hi {{First_Name}},\n\nHere's what happens with a typical home improvement lead:\n\n[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]\n\nYour rep calls back and asks, \"What were you looking for?\"\n\nThe customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.\n\nWith Nook, your team already knows:\n\n→ What project they're planning\n→ Product preferences\n→ Style direction\n→ Budget signals\n\nYour first conversation picks up where the website left off. No starting from scratch.\n\n[BUTTON: See How Nook Captures Leads]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        },
+        {
+          "day": 10,
+          "title": "Your website could be doing the selling for you",
+          "variants": {
+            "flooring": {
+              "subject": "Your website could be doing the selling for you",
+              "preview": "Turn browsers into buyers before they visit your showroom",
+              "body": "Hi {{First_Name}},\n\nMost flooring retailers treat their website like a brochure. Visitors browse products, maybe fill out a contact form, then show up to the showroom still figuring out what they want.\n\nNook turns your website into the start of the sale.\n\n[IMAGE: Nook embedded on flooring website showing interactive planning tool]\n\nIt embeds right on your site and guides shoppers through a planning experience:\n\n→ They select room type and enter square footage\n→ They narrow material options (hardwood, LVP, tile, carpet)\n→ They browse your products and pick styles they like\n→ They build a plan that your team can see and work from\n\nBy the time they reach out, they're not just curious — they're ready to move forward.\n\n[BUTTON: Try a Sample Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "Your website could be doing the selling for you",
+              "preview": "Turn browsers into buyers before they visit your showroom",
+              "body": "Hi {{First_Name}},\n\nMost lighting retailers treat their website like a catalog. Visitors browse fixtures, maybe fill out a contact form, then show up to the showroom still overwhelmed by options.\n\nNook turns your website into the start of the sale.\n\n[IMAGE: Nook embedded on lighting website showing interactive planning tool]\n\nIt embeds right on your site and guides shoppers through a planning experience:\n\n→ They select which rooms they're planning\n→ They explore fixture types (chandeliers, pendants, recessed, sconces)\n→ They browse your products and narrow style direction\n→ They build a plan that your team can see and work from\n\nBy the time they reach out, they're not just curious — they're ready to move forward.\n\n[BUTTON: Try a Sample Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "Your website could be doing the selling for you",
+              "preview": "Turn browsers into buyers before they visit your showroom",
+              "body": "Hi {{First_Name}},\n\nMost home improvement retailers treat their website like a brochure. Visitors browse products, maybe fill out a contact form, then show up still figuring out what they want.\n\nNook turns your website into the start of the sale.\n\n[IMAGE: Nook embedded on website showing interactive planning tool]\n\nIt embeds right on your site and guides shoppers through a planning experience:\n\n→ They define their project scope\n→ They explore product options\n→ They narrow preferences and style direction\n→ They build a plan that your team can see and work from\n\nBy the time they reach out, they're not just curious — they're ready to move forward.\n\n[BUTTON: Try a Sample Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        },
+        {
+          "day": 18,
+          "title": "How flooring teams close faster with Nook",
+          "variants": {
+            "flooring": {
+              "subject": "How flooring teams close faster with Nook",
+              "preview": "Before and after: scattered follow-up vs. one workspace",
+              "body": "Hi {{First_Name}},\n\nI've been talking a lot about lead capture, but that's just the beginning.\n\nThe real value is what happens after the first visit.\n\n[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]\n\nBefore Nook, follow-up looks like this:\n\n→ Texting product photos back and forth\n→ Emailing PDFs that get lost in inboxes\n→ Customers forgetting what was discussed\n→ Reps starting over when someone else picks up the conversation\n\nWith Nook, everything stays in one shared workspace:\n\n→ Product cards with pricing and specs\n→ Messaging and commenting on specific items\n→ Updated plans that reflect decisions in real time\n→ Full visibility for the whole team\n\nFlooring retailers tell us it cuts days off the decision cycle and makes premium upgrades easier to close.\n\n[BUTTON: Book a 15-Minute Demo]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "How flooring teams close faster with Nook",
+              "preview": "Before and after: scattered follow-up vs. one workspace",
+              "body": "Hi {{First_Name}},\n\nI've been talking a lot about lead capture, but that's just the beginning.\n\nThe real value is what happens after the first visit.\n\n[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]\n\nBefore Nook, follow-up looks like this:\n\n→ Texting fixture photos back and forth\n→ Emailing PDFs that get lost in inboxes\n→ Customers forgetting what was discussed\n→ Reps starting over when someone else picks up the conversation\n\nWith Nook, everything stays in one shared workspace:\n\n→ Product cards with pricing and specs\n→ Messaging and commenting on specific fixtures\n→ Updated plans that reflect decisions in real time\n→ Full visibility for the whole team\n\nLighting retailers tell us it cuts days off the decision cycle and makes premium fixture upgrades easier to close.\n\n[BUTTON: Book a 15-Minute Demo]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "How flooring teams close faster with Nook",
+              "preview": "Before and after: scattered follow-up vs. one workspace",
+              "body": "Hi {{First_Name}},\n\nI've been talking a lot about lead capture, but that's just the beginning.\n\nThe real value is what happens after the first visit.\n\n[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]\n\nBefore Nook, follow-up looks like this:\n\n→ Texting product info back and forth\n→ Emailing PDFs that get lost in inboxes\n→ Customers forgetting what was discussed\n→ Reps starting over when someone else picks up the conversation\n\nWith Nook, everything stays in one shared workspace:\n\n→ Product cards with pricing and specs\n→ Messaging and commenting on specific items\n→ Updated plans that reflect decisions in real time\n→ Full visibility for the whole team\n\nHome improvement retailers tell us it cuts days off the decision cycle and makes premium upgrades easier to close.\n\n[BUTTON: Book a 15-Minute Demo]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        },
+        {
+          "day": 28,
+          "title": "Still exploring? Let's make it easy",
+          "variants": {
+            "flooring": {
+              "subject": "Still exploring? Let's make it easy",
+              "preview": "90-day free trial, no risk",
+              "body": "Hi {{First_Name}},\n\nI wanted to check in one more time.\n\nIf you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your flooring business.\n\n[IMAGE: Calendar with '90 Days Free' text]\n\nHere's what you get with the 90-day free trial:\n\n→ Nook embedded on your website\n→ Unlimited lead submissions with full context\n→ Shared workspace for your sales team\n→ Product library and messaging tools\n→ Dashboards to track engagement and pipeline\n\nNo contracts. No credit card required. Just 90 days to see if it works for you.\n\n[BUTTON: Book a Call]\n\nAnd if you'd rather just start exploring on your own, you can try a sample plan here:\n[LINK: Try a Sample Flooring Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "lighting": {
+              "subject": "Still exploring? Let's make it easy",
+              "preview": "90-day free trial, no risk",
+              "body": "Hi {{First_Name}},\n\nI wanted to check in one more time.\n\nIf you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your lighting business.\n\n[IMAGE: Calendar with '90 Days Free' text]\n\nHere's what you get with the 90-day free trial:\n\n→ Nook embedded on your website\n→ Unlimited lead submissions with full context\n→ Shared workspace for your sales team\n→ Product library and messaging tools\n→ Dashboards to track engagement and pipeline\n\nNo contracts. No credit card required. Just 90 days to see if it works for you.\n\n[BUTTON: Book a Call]\n\nAnd if you'd rather just start exploring on your own, you can try a sample plan here:\n[LINK: Try a Sample Lighting Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            },
+            "generic": {
+              "subject": "Still exploring? Let's make it easy",
+              "preview": "90-day free trial, no risk",
+              "body": "Hi {{First_Name}},\n\nI wanted to check in one more time.\n\nIf you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your business.\n\n[IMAGE: Calendar with '90 Days Free' text]\n\nHere's what you get with the 90-day free trial:\n\n→ Nook embedded on your website\n→ Unlimited lead submissions with full context\n→ Shared workspace for your sales team\n→ Product library and messaging tools\n→ Dashboards to track engagement and pipeline\n\nNo contracts. No credit card required. Just 90 days to see if it works for you.\n\n[BUTTON: Book a Call]\n\nAnd if you'd rather just start exploring on your own, you can try a sample plan here:\n[LINK: Try a Sample Plan]\n\nMarc Signer\nFounder, Nook\n\nQuestions? Just reply to this email."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

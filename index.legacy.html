@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nook Email Campaign Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .save-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .save-indicator.saving {
+            background: rgba(255,193,7,0.3);
+        }
+
+        .save-indicator.saved {
+            background: rgba(76,175,80,0.3);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 20px 30px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .controls select, .controls button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .controls select {
+            background: white;
+        }
+
+        .controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .controls button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .controls button.secondary {
+            background: #6c757d;
+        }
+
+        .controls button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .controls button.danger {
+            background: #dc3545;
+        }
+
+        .controls button.danger:hover {
+            background: #c82333;
+        }
+
+        .controls button.success {
+            background: #28a745;
+        }
+
+        .controls button.success:hover {
+            background: #218838;
+        }
+
+        .campaign-selector {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .campaign-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .campaign-controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .campaign-controls select {
+            flex: 1;
+            max-width: 400px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .campaign-controls button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-weight: 600;
+        }
+
+        .campaign-controls button.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .campaign-controls button.success:hover {
+            background: #218838;
+        }
+
+        .campaign-controls button.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .campaign-controls button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .campaign-controls button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .campaign-controls button.danger:hover {
+            background: #c82333;
+        }
+
+        .campaign-controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .campaign-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .campaign-info p {
+            margin: 0 0 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .campaign-info span {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .email-management {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .email-management button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-weight: 600;
+        }
+
+        .email-management button.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .email-management button.success:hover {
+            background: #218838;
+        }
+
+        .email-management button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .email-management button.danger:hover {
+            background: #c82333;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .email-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .email-btn {
+            padding: 12px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .email-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .email-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .email-content {
+            display: none;
+        }
+
+        .email-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .field-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .field-group label {
+            display: block;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-group input,
+        .field-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .field-group input:focus,
+        .field-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .field-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .field-group.body textarea {
+            min-height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .variant-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .variant-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .variant-tab:hover {
+            color: #333;
+        }
+
+        .variant-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .variant-content {
+            display: none;
+        }
+
+        .variant-content.active {
+            display: block;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box strong {
+            color: #856404;
+        }
+
+        .info-box.cloud {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+        }
+
+        .info-box.cloud strong {
+            color: #0c5460;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #155724;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .last-saved {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Nook Email Campaign Editor</h1>
+            <p>Campaign 1: Watch Video Nurture | 6 Emails over 28 Days</p>
+            <span class="save-indicator" id="saveIndicator">Auto-save enabled</span>
+        </div>
+
+        <div class="controls">
+            <label>Quick Actions:</label>
+            <button onclick="saveToFile()">💾 Download JSON</button>
+            <button onclick="showImportModal()" class="secondary">📥 Import JSON</button>
+            <button onclick="copyAllEmails()">📋 Copy All</button>
+            <button onclick="resetToDefaults()" class="danger">🔄 Reset to Default</button>
+            <button onclick="showSetupModal()" class="success">⚙️ Cloud Sync Setup</button>
+            <span class="last-saved" id="lastSaved"></span>
+        </div>
+
+        <div class="campaign-selector">
+            <div class="campaign-controls">
+                <label>Campaign:</label>
+                <select id="campaignSelect" onchange="selectCampaign(this.value)"></select>
+                <button onclick="showAddCampaignModal()" class="success">+ Add Campaign</button>
+                <button onclick="editCampaignMetadata()" class="secondary">✏️ Edit</button>
+                <button onclick="deleteCampaign()" class="danger" id="deleteCampaignBtn">🗑️ Delete</button>
+            </div>
+            <div class="campaign-info">
+                <h3 id="campaignTitle"></h3>
+                <p id="campaignDescription"></p>
+                <span id="campaignStats"></span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="info-box cloud" id="cloudStatus">
+                <strong>☁️ Cloud Sync:</strong> <span id="cloudStatusText">Not configured. Click "Cloud Sync Setup" to enable.</span>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Auto-Save:</strong> All your changes are automatically saved to your browser. Your edits persist even if you close the page.
+            </div>
+
+            <div class="email-management">
+                <button onclick="addEmail()" class="success">+ Add Email</button>
+                <button onclick="deleteEmail()" class="danger" id="deleteEmailBtn">- Delete Email</button>
+                <span class="helper-text">Manage emails in the current campaign</span>
+            </div>
+
+            <div class="email-selector" id="emailSelector"></div>
+            <div id="emailsContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <h3>Import Campaign Data</h3>
+            <p style="margin-bottom: 15px; color: #666;">Paste your JSON data below to restore a previous version:</p>
+            <textarea id="importTextarea" placeholder='Paste JSON data here...'></textarea>
+            <div class="modal-actions">
+                <button onclick="closeImportModal()" class="secondary">Cancel</button>
+                <button onclick="importData()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="setupModal">
+        <div class="modal-content">
+            <h3>⚙️ GitHub Cloud Sync Configuration</h3>
+            <p style="margin-bottom: 15px; color: #666;">Enable cloud sync to share data across your team (2-5 people).</p>
+
+            <div class="field-group">
+                <label>GitHub Personal Access Token (PAT)</label>
+                <input type="password" id="setupToken" placeholder="ghp_..."
+                    value="" style="font-family: monospace;">
+                <div class="helper-text">
+                    Create at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> with "gist" scope
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label>Gist ID</label>
+                <input type="text" id="setupGistId" placeholder="abc123..."
+                    value="" style="font-family: monospace;">
+                <div class="helper-text">
+                    Create a Gist at <a href="https://gist.github.com" target="_blank">gist.github.com</a> with your campaign data
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>ℹ️ Setup Help:</strong> See SETUP.md for detailed instructions on creating a Gist and PAT.
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="closeSetupModal()" class="secondary">Cancel</button>
+                <button onclick="saveSetup()" class="success">Save & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="campaignModal">
+        <div class="modal-content">
+            <h3 id="campaignModalTitle">Create New Campaign</h3>
+            <div class="field-group">
+                <label>Campaign Name</label>
+                <input type="text" id="campaignNameInput" placeholder="e.g., Feature Launch Sequence">
+            </div>
+            <div class="field-group">
+                <label>Description/Notes (Optional)</label>
+                <textarea id="campaignDescInput" placeholder="Campaign purpose, trigger, audience..." style="min-height: 80px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button onclick="closeCampaignModal()" class="secondary">Cancel</button>
+                <button onclick="saveCampaignModal()" class="success" id="saveCampaignBtn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            gistId: localStorage.getItem('gistId') || '',
+            githubToken: localStorage.getItem('githubToken') || '',
+            saveDebounce: 2000 // Save to Gist every 2 seconds after changes
+        };
+
+        const DEFAULT_DATA = [
+            {
+                day: 0,
+                title: "Your Nook video is ready",
+                variants: {
+                    flooring: {
+                        subject: "Your Nook video is ready",
+                        preview: "See how flooring teams turn website visitors into ready-to-buy customers",
+                        body: `Hi {{First_Name}},
+
+Thanks for requesting a Nook video. Here it is:
+
+[VIDEO THUMBNAIL - Flooring interface with hardwood/LVP/tile options visible]
+
+[BUTTON: Watch Video]
+
+You'll see how flooring teams capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.
+
+The video is about 2 minutes. Let me know if you have questions after watching.
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: "Your Nook video is ready",
+                        preview: "See how lighting teams turn website visitors into ready-to-buy customers",
+                        body: `Hi {{First_Name}},
+
+Thanks for requesting a Nook video. Here it is:
+
+[VIDEO THUMBNAIL - Lighting interface with chandelier/pendant/recessed options visible]
+
+[BUTTON: Watch Video]
+
+You'll see how lighting teams capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.
+
+The video is about 2 minutes. Let me know if you have questions after watching.
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: "Your Nook video is ready",
+                        preview: "See how home improvement teams turn website visitors into ready-to-buy customers",
+                        body: `Hi {{First_Name}},
+
+Thanks for requesting a Nook video. Here it is:
+
+[VIDEO THUMBNAIL - Generic home improvement interface]
+
+[BUTTON: Watch Video]
+
+You'll see how home improvement retailers capture high-context leads, guide shoppers through a planning experience, and keep deals moving in one shared workspace.
+
+The video is about 2 minutes. Let me know if you have questions after watching.
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            },
+            {
+                day: 2,
+                title: "What you'll see inside Nook",
+                variants: {
+                    flooring: {
+                        subject: "What you'll see inside Nook",
+                        preview: "High-context leads, guided planning, and a shared workspace",
+                        body: `Hi {{First_Name}},
+
+Did you get a chance to watch the video?
+
+If not, here's what you'll see:
+
+[THREE-PANEL IMAGE: (1) lead capture form with room details, (2) flooring material selection grid, (3) shared workspace]
+
+1. High-context leads — Your website visitors tell you square footage, room type, material preferences (hardwood, LVP, tile, carpet), and style direction before the first call.
+
+2. Guided planning experience — Shoppers build a plan on your site, narrowing options and clarifying what they want. They show up ready to buy, not just browse.
+
+3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.
+
+[BUTTON: Watch the Video]
+
+Or if you'd rather see it yourself:
+[LINK: Try a Sample Flooring Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: "What you'll see inside Nook",
+                        preview: "High-context leads, guided planning, and a shared workspace",
+                        body: `Hi {{First_Name}},
+
+Did you get a chance to watch the video?
+
+If not, here's what you'll see:
+
+[THREE-PANEL IMAGE: (1) lead capture form with room details, (2) lighting fixture selection grid, (3) shared workspace]
+
+1. High-context leads — Your website visitors tell you room type, fixture preferences (chandeliers, pendants, recessed, sconces), style direction, and budget signals before the first call.
+
+2. Guided planning experience — Shoppers build a plan on your site, exploring fixtures and visualizing how they fit their space. They show up ready to buy, not just browse.
+
+3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.
+
+[BUTTON: Watch the Video]
+
+Or if you'd rather see it yourself:
+[LINK: Try a Sample Lighting Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: "What you'll see inside Nook",
+                        preview: "High-context leads, guided planning, and a shared workspace",
+                        body: `Hi {{First_Name}},
+
+Did you get a chance to watch the video?
+
+If not, here's what you'll see:
+
+[THREE-PANEL IMAGE: (1) lead capture form, (2) product selection interface, (3) shared workspace]
+
+1. High-context leads — Your website visitors tell you project details, product preferences, style direction, and budget signals before the first call.
+
+2. Guided planning experience — Shoppers build a plan on your site, narrowing options and clarifying what they want. They show up ready to buy, not just browse.
+
+3. One shared workspace — Your team keeps the conversation going with product sharing, messaging, and plan updates. No more scattered texts and PDFs.
+
+[BUTTON: Watch the Video]
+
+Or if you'd rather see it yourself:
+[LINK: Try a Sample Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            },
+            {
+                day: 5,
+                title: 'Why "name + phone" leads cost you sales',
+                variants: {
+                    flooring: {
+                        subject: 'Why "name + phone" leads cost you sales',
+                        preview: "The hidden cost of low-context leads",
+                        body: `Hi {{First_Name}},
+
+Here's what happens with a typical flooring lead:
+
+[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]
+
+Your rep calls back and asks, "What were you looking for?"
+
+The customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.
+
+With Nook, your team already knows:
+
+→ What room they're planning
+→ Square footage
+→ Material type (hardwood, LVP, tile, carpet)
+→ Style preferences
+→ Budget signals
+
+Your first conversation picks up where the website left off. No starting from scratch.
+
+[BUTTON: See How Nook Captures Leads]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: 'Why "name + phone" leads cost you sales',
+                        preview: "The hidden cost of low-context leads",
+                        body: `Hi {{First_Name}},
+
+Here's what happens with a typical lighting lead:
+
+[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]
+
+Your rep calls back and asks, "What were you looking for?"
+
+The customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.
+
+With Nook, your team already knows:
+
+→ Which rooms they're planning
+→ Fixture types they're considering
+→ Style direction (modern, traditional, transitional)
+→ Budget range
+
+Your first conversation picks up where the website left off. No starting from scratch.
+
+[BUTTON: See How Nook Captures Leads]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: 'Why "name + phone" leads cost you sales',
+                        preview: "The hidden cost of low-context leads",
+                        body: `Hi {{First_Name}},
+
+Here's what happens with a typical home improvement lead:
+
+[TWO-COLUMN IMAGE: LEFT shows 'Typical Lead' with just 'John Smith (555) 123-4567' | RIGHT shows 'Nook Lead' with rich details]
+
+Your rep calls back and asks, "What were you looking for?"
+
+The customer has to re-explain everything. Sometimes they've already moved on to another store. Sometimes they don't even remember submitting a form.
+
+With Nook, your team already knows:
+
+→ What project they're planning
+→ Product preferences
+→ Style direction
+→ Budget signals
+
+Your first conversation picks up where the website left off. No starting from scratch.
+
+[BUTTON: See How Nook Captures Leads]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            },
+            {
+                day: 10,
+                title: "Your website could be doing the selling for you",
+                variants: {
+                    flooring: {
+                        subject: "Your website could be doing the selling for you",
+                        preview: "Turn browsers into buyers before they visit your showroom",
+                        body: `Hi {{First_Name}},
+
+Most flooring retailers treat their website like a brochure. Visitors browse products, maybe fill out a contact form, then show up to the showroom still figuring out what they want.
+
+Nook turns your website into the start of the sale.
+
+[IMAGE: Nook embedded on flooring website showing interactive planning tool]
+
+It embeds right on your site and guides shoppers through a planning experience:
+
+→ They select room type and enter square footage
+→ They narrow material options (hardwood, LVP, tile, carpet)
+→ They browse your products and pick styles they like
+→ They build a plan that your team can see and work from
+
+By the time they reach out, they're not just curious — they're ready to move forward.
+
+[BUTTON: Try a Sample Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: "Your website could be doing the selling for you",
+                        preview: "Turn browsers into buyers before they visit your showroom",
+                        body: `Hi {{First_Name}},
+
+Most lighting retailers treat their website like a catalog. Visitors browse fixtures, maybe fill out a contact form, then show up to the showroom still overwhelmed by options.
+
+Nook turns your website into the start of the sale.
+
+[IMAGE: Nook embedded on lighting website showing interactive planning tool]
+
+It embeds right on your site and guides shoppers through a planning experience:
+
+→ They select which rooms they're planning
+→ They explore fixture types (chandeliers, pendants, recessed, sconces)
+→ They browse your products and narrow style direction
+→ They build a plan that your team can see and work from
+
+By the time they reach out, they're not just curious — they're ready to move forward.
+
+[BUTTON: Try a Sample Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: "Your website could be doing the selling for you",
+                        preview: "Turn browsers into buyers before they visit your showroom",
+                        body: `Hi {{First_Name}},
+
+Most home improvement retailers treat their website like a brochure. Visitors browse products, maybe fill out a contact form, then show up still figuring out what they want.
+
+Nook turns your website into the start of the sale.
+
+[IMAGE: Nook embedded on website showing interactive planning tool]
+
+It embeds right on your site and guides shoppers through a planning experience:
+
+→ They define their project scope
+→ They explore product options
+→ They narrow preferences and style direction
+→ They build a plan that your team can see and work from
+
+By the time they reach out, they're not just curious — they're ready to move forward.
+
+[BUTTON: Try a Sample Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            },
+            {
+                day: 18,
+                title: "How flooring teams close faster with Nook",
+                variants: {
+                    flooring: {
+                        subject: "How flooring teams close faster with Nook",
+                        preview: "Before and after: scattered follow-up vs. one workspace",
+                        body: `Hi {{First_Name}},
+
+I've been talking a lot about lead capture, but that's just the beginning.
+
+The real value is what happens after the first visit.
+
+[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]
+
+Before Nook, follow-up looks like this:
+
+→ Texting product photos back and forth
+→ Emailing PDFs that get lost in inboxes
+→ Customers forgetting what was discussed
+→ Reps starting over when someone else picks up the conversation
+
+With Nook, everything stays in one shared workspace:
+
+→ Product cards with pricing and specs
+→ Messaging and commenting on specific items
+→ Updated plans that reflect decisions in real time
+→ Full visibility for the whole team
+
+Flooring retailers tell us it cuts days off the decision cycle and makes premium upgrades easier to close.
+
+[BUTTON: Book a 15-Minute Demo]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: "How flooring teams close faster with Nook",
+                        preview: "Before and after: scattered follow-up vs. one workspace",
+                        body: `Hi {{First_Name}},
+
+I've been talking a lot about lead capture, but that's just the beginning.
+
+The real value is what happens after the first visit.
+
+[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]
+
+Before Nook, follow-up looks like this:
+
+→ Texting fixture photos back and forth
+→ Emailing PDFs that get lost in inboxes
+→ Customers forgetting what was discussed
+→ Reps starting over when someone else picks up the conversation
+
+With Nook, everything stays in one shared workspace:
+
+→ Product cards with pricing and specs
+→ Messaging and commenting on specific fixtures
+→ Updated plans that reflect decisions in real time
+→ Full visibility for the whole team
+
+Lighting retailers tell us it cuts days off the decision cycle and makes premium fixture upgrades easier to close.
+
+[BUTTON: Book a 15-Minute Demo]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: "How flooring teams close faster with Nook",
+                        preview: "Before and after: scattered follow-up vs. one workspace",
+                        body: `Hi {{First_Name}},
+
+I've been talking a lot about lead capture, but that's just the beginning.
+
+The real value is what happens after the first visit.
+
+[BEFORE/AFTER IMAGE: LEFT shows chaos (texts, emails, PDFs scattered) | RIGHT shows clean Nook workspace]
+
+Before Nook, follow-up looks like this:
+
+→ Texting product info back and forth
+→ Emailing PDFs that get lost in inboxes
+→ Customers forgetting what was discussed
+→ Reps starting over when someone else picks up the conversation
+
+With Nook, everything stays in one shared workspace:
+
+→ Product cards with pricing and specs
+→ Messaging and commenting on specific items
+→ Updated plans that reflect decisions in real time
+→ Full visibility for the whole team
+
+Home improvement retailers tell us it cuts days off the decision cycle and makes premium upgrades easier to close.
+
+[BUTTON: Book a 15-Minute Demo]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            },
+            {
+                day: 28,
+                title: "Still exploring? Let's make it easy",
+                variants: {
+                    flooring: {
+                        subject: "Still exploring? Let's make it easy",
+                        preview: "90-day free trial, no risk",
+                        body: `Hi {{First_Name}},
+
+I wanted to check in one more time.
+
+If you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your flooring business.
+
+[IMAGE: Calendar with '90 Days Free' text]
+
+Here's what you get with the 90-day free trial:
+
+→ Nook embedded on your website
+→ Unlimited lead submissions with full context
+→ Shared workspace for your sales team
+→ Product library and messaging tools
+→ Dashboards to track engagement and pipeline
+
+No contracts. No credit card required. Just 90 days to see if it works for you.
+
+[BUTTON: Book a Call]
+
+And if you'd rather just start exploring on your own, you can try a sample plan here:
+[LINK: Try a Sample Flooring Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    lighting: {
+                        subject: "Still exploring? Let's make it easy",
+                        preview: "90-day free trial, no risk",
+                        body: `Hi {{First_Name}},
+
+I wanted to check in one more time.
+
+If you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your lighting business.
+
+[IMAGE: Calendar with '90 Days Free' text]
+
+Here's what you get with the 90-day free trial:
+
+→ Nook embedded on your website
+→ Unlimited lead submissions with full context
+→ Shared workspace for your sales team
+→ Product library and messaging tools
+→ Dashboards to track engagement and pipeline
+
+No contracts. No credit card required. Just 90 days to see if it works for you.
+
+[BUTTON: Book a Call]
+
+And if you'd rather just start exploring on your own, you can try a sample plan here:
+[LINK: Try a Sample Lighting Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    },
+                    generic: {
+                        subject: "Still exploring? Let's make it easy",
+                        preview: "90-day free trial, no risk",
+                        body: `Hi {{First_Name}},
+
+I wanted to check in one more time.
+
+If you're still thinking about Nook, I'd love to set up a quick call to walk you through exactly how it would work for your business.
+
+[IMAGE: Calendar with '90 Days Free' text]
+
+Here's what you get with the 90-day free trial:
+
+→ Nook embedded on your website
+→ Unlimited lead submissions with full context
+→ Shared workspace for your sales team
+→ Product library and messaging tools
+→ Dashboards to track engagement and pipeline
+
+No contracts. No credit card required. Just 90 days to see if it works for you.
+
+[BUTTON: Book a Call]
+
+And if you'd rather just start exploring on your own, you can try a sample plan here:
+[LINK: Try a Sample Plan]
+
+Marc Signer
+Founder, Nook
+
+Questions? Just reply to this email.`
+                    }
+                }
+            }
+        ];
+
+        // Multi-campaign data structure
+        let campaignsData = { version: "2.0", campaigns: [] };
+        let currentCampaignId = null;
+        let currentEmailIndex = 0;
+        let saveTimeout = null;
+
+        // Helper: Get current campaign object
+        function getCurrentCampaign() {
+            if (!currentCampaignId || !campaignsData.campaigns) return null;
+            return campaignsData.campaigns.find(c => c.id === currentCampaignId);
+        }
+
+        // Helper: Generate unique campaign ID
+        function generateCampaignId() {
+            return 'campaign-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Migration: Convert v1 (flat array) to v2 (campaigns structure)
+        function migrateFromV1(data) {
+            // Check if already v2 format
+            if (data && typeof data === 'object' && data.version === "2.0" && Array.isArray(data.campaigns)) {
+                return data;
+            }
+
+            // Check if v1 format (flat array of emails)
+            if (Array.isArray(data)) {
+                console.log('Migrating from v1 to v2 format...');
+                return {
+                    version: "2.0",
+                    campaigns: [{
+                        id: "campaign-1",
+                        name: "Campaign 1: Watch Video Nurture",
+                        description: "Migrated from previous version",
+                        createdAt: new Date().toISOString(),
+                        emails: data
+                    }]
+                };
+            }
+
+            // Unknown format, return default
+            console.warn('Unknown data format, using defaults');
+            return {
+                version: "2.0",
+                campaigns: [{
+                    id: "campaign-1",
+                    name: "Campaign 1: Watch Video Nurture",
+                    description: "28-day nurture sequence for Watch Video form submissions",
+                    createdAt: new Date().toISOString(),
+                    emails: JSON.parse(JSON.stringify(DEFAULT_DATA))
+                }]
+            };
+        }
+
+        // GitHub Gist API functions
+        async function loadFromGist() {
+            if (!CONFIG.githubToken || !CONFIG.gistId) {
+                console.log('No GitHub token or Gist ID, using localStorage only');
+                return null;
+            }
+
+            try {
+                const response = await fetch(`https://api.github.com/gists/${CONFIG.gistId}`, {
+                    headers: {
+                        'Authorization': `token ${CONFIG.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch Gist:', response.status);
+                    return null;
+                }
+
+                const gist = await response.json();
+                const filename = Object.keys(gist.files)[0];
+                const content = gist.files[filename].content;
+
+                return JSON.parse(content);
+            } catch (error) {
+                console.error('Error loading from Gist:', error);
+                return null;
+            }
+        }
+
+        async function saveToGist(data) {
+            if (!CONFIG.githubToken || !CONFIG.gistId) {
+                console.log('No GitHub token or Gist ID, saving to localStorage only');
+                return false;
+            }
+
+            try {
+                const response = await fetch(`https://api.github.com/gists/${CONFIG.gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${CONFIG.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            'nook-campaign.json': {
+                                content: JSON.stringify(data, null, 2)
+                            }
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to update Gist:', response.status);
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error saving to Gist:', error);
+                return false;
+            }
+        }
+
+        // Initialize data from Gist or localStorage or defaults
+        async function initData() {
+            let loadedData = null;
+
+            // Try loading from Gist first
+            const gistData = await loadFromGist();
+
+            if (gistData) {
+                loadedData = gistData;
+                console.log('Loaded data from GitHub Gist');
+                updateCloudStatus(true);
+            } else {
+                // Fall back to localStorage
+                const saved = localStorage.getItem('nookEmailCampaign');
+                if (saved) {
+                    try {
+                        loadedData = JSON.parse(saved);
+                        console.log('Loaded data from localStorage');
+                    } catch (e) {
+                        console.error('Error loading saved data:', e);
+                        loadedData = null;
+                    }
+                }
+                updateCloudStatus(false);
+            }
+
+            // Migrate to v2 format if needed
+            campaignsData = migrateFromV1(loadedData);
+
+            // Set current campaign to first campaign
+            if (campaignsData.campaigns && campaignsData.campaigns.length > 0) {
+                currentCampaignId = campaignsData.campaigns[0].id;
+            }
+
+            updateLastSaved();
+        }
+
+        // Save to localStorage and Gist with debounce
+        function saveData() {
+            clearTimeout(saveTimeout);
+
+            const indicator = document.getElementById('saveIndicator');
+            indicator.textContent = 'Saving...';
+            indicator.className = 'save-indicator saving';
+
+            saveTimeout = setTimeout(async () => {
+                // Save to localStorage first (immediate)
+                localStorage.setItem('nookEmailCampaign', JSON.stringify(campaignsData));
+                localStorage.setItem('nookEmailCampaignLastSaved', new Date().toISOString());
+
+                // Save to Gist (background sync)
+                const gistSaved = await saveToGist(campaignsData);
+
+                if (gistSaved) {
+                    indicator.textContent = 'Saved to Cloud ✓';
+                    updateCloudStatus(true);
+                } else {
+                    indicator.textContent = 'Saved Locally ✓';
+                }
+                indicator.className = 'save-indicator saved';
+                updateLastSaved();
+
+                setTimeout(() => {
+                    indicator.textContent = gistSaved ? 'Cloud sync enabled' : 'Local save only';
+                    indicator.className = 'save-indicator';
+                }, 2000);
+            }, CONFIG.saveDebounce);
+        }
+
+        function updateLastSaved() {
+            const lastSaved = localStorage.getItem('nookEmailCampaignLastSaved');
+            if (lastSaved) {
+                const date = new Date(lastSaved);
+                const formatted = date.toLocaleString();
+                document.getElementById('lastSaved').textContent = `Last saved: ${formatted}`;
+            }
+        }
+
+        function updateCloudStatus(isConnected) {
+            const statusText = document.getElementById('cloudStatusText');
+            if (isConnected) {
+                statusText.textContent = 'Connected! Data syncs automatically across your team.';
+            } else {
+                statusText.textContent = 'Not configured. Click "Cloud Sync Setup" to enable team sharing.';
+            }
+        }
+
+        // Render campaign selector dropdown and info
+        function renderCampaigns() {
+            const select = document.getElementById('campaignSelect');
+            const title = document.getElementById('campaignTitle');
+            const description = document.getElementById('campaignDescription');
+            const stats = document.getElementById('campaignStats');
+            const deleteBtn = document.getElementById('deleteCampaignBtn');
+
+            if (!select) return; // UI not ready yet
+
+            // Populate dropdown
+            select.innerHTML = '';
+            campaignsData.campaigns.forEach(campaign => {
+                const option = document.createElement('option');
+                option.value = campaign.id;
+                option.textContent = campaign.name;
+                option.selected = campaign.id === currentCampaignId;
+                select.appendChild(option);
+            });
+
+            // Update campaign info
+            const campaign = getCurrentCampaign();
+            if (campaign) {
+                title.textContent = campaign.name;
+                description.textContent = campaign.description || 'No description';
+                stats.textContent = `${campaign.emails.length} email${campaign.emails.length !== 1 ? 's' : ''}`;
+            }
+
+            // Disable delete if only 1 campaign
+            if (deleteBtn) {
+                deleteBtn.disabled = campaignsData.campaigns.length <= 1;
+            }
+        }
+
+        // Render emails for current campaign
+        function renderEmails() {
+            const selectorContainer = document.getElementById('emailSelector');
+            const emailsContainer = document.getElementById('emailsContainer');
+
+            if (!selectorContainer || !emailsContainer) return;
+
+            selectorContainer.innerHTML = '';
+            emailsContainer.innerHTML = '';
+
+            const campaign = getCurrentCampaign();
+            if (!campaign || !campaign.emails) {
+                emailsContainer.innerHTML = '<p style="padding: 20px;">No emails in this campaign. Click "+ Add Email" to create one.</p>';
+                return;
+            }
+
+            campaign.emails.forEach((email, index) => {
+                // Create selector button
+                const btn = document.createElement('div');
+                btn.className = `email-btn ${index === currentEmailIndex ? 'active' : ''}`;
+                btn.onclick = () => selectEmail(index);
+                btn.innerHTML = `Day ${email.day}<br>${email.title.substring(0, 20)}${email.title.length > 20 ? '...' : ''}`;
+                selectorContainer.appendChild(btn);
+
+                // Create email content
+                const emailDiv = document.createElement('div');
+                emailDiv.className = `email-content ${index === currentEmailIndex ? 'active' : ''}`;
+                emailDiv.id = `email-${index}`;
+
+                emailDiv.innerHTML = `
+                    <h2 style="margin-bottom: 20px; color: #333;">Day ${email.day}: ${email.title}</h2>
+
+                    <div class="variant-tabs">
+                        <button class="variant-tab active" onclick="selectVariant(${index}, 'flooring')">Flooring</button>
+                        <button class="variant-tab" onclick="selectVariant(${index}, 'lighting')">Lighting</button>
+                        <button class="variant-tab" onclick="selectVariant(${index}, 'generic')">Generic</button>
+                    </div>
+
+                    ${Object.entries(email.variants).map(([variant, data], vIndex) => `
+                        <div class="variant-content ${vIndex === 0 ? 'active' : ''}" id="email-${index}-${variant}">
+                            <div class="field-group">
+                                <label>Subject Line</label>
+                                <input type="text" value="${data.subject.replace(/"/g, '&quot;')}"
+                                    oninput="updateData(${index}, '${variant}', 'subject', this.value)">
+                            </div>
+
+                            <div class="field-group">
+                                <label>Preview Text</label>
+                                <input type="text" value="${data.preview.replace(/"/g, '&quot;')}"
+                                    oninput="updateData(${index}, '${variant}', 'preview', this.value)">
+                                <div class="helper-text">This appears in the inbox preview</div>
+                            </div>
+
+                            <div class="field-group body">
+                                <label>Email Body</label>
+                                <textarea oninput="updateData(${index}, '${variant}', 'body', this.value)">${data.body}</textarea>
+                                <div class="helper-text">Use [BUTTON: Text] and [LINK: Text] for CTAs. Use {{First_Name}} for personalization.</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+
+                emailsContainer.appendChild(emailDiv);
+            });
+        }
+
+        // Select campaign and render its emails
+        function selectCampaign(campaignId) {
+            currentCampaignId = campaignId;
+            currentEmailIndex = 0;
+            renderCampaigns();
+            renderEmails();
+        }
+
+        function selectEmail(index) {
+            currentEmailIndex = index;
+            document.querySelectorAll('.email-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.email-content').forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+        }
+
+        function selectVariant(emailIndex, variant) {
+            const emailDiv = document.getElementById(`email-${emailIndex}`);
+            emailDiv.querySelectorAll('.variant-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            emailDiv.querySelectorAll('.variant-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+            document.getElementById(`email-${emailIndex}-${variant}`).classList.add('active');
+        }
+
+        function updateData(emailIndex, variant, field, value) {
+            const campaign = getCurrentCampaign();
+            if (campaign && campaign.emails && campaign.emails[emailIndex]) {
+                campaign.emails[emailIndex].variants[variant][field] = value;
+                saveData();
+            }
+        }
+
+        function saveToFile() {
+            const dataStr = JSON.stringify(campaignsData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `nook-campaigns-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('importTextarea').value = '';
+        }
+
+        function importData() {
+            const textarea = document.getElementById('importTextarea');
+            try {
+                const imported = JSON.parse(textarea.value);
+                // Migrate if needed
+                campaignsData = migrateFromV1(imported);
+                currentCampaignId = campaignsData.campaigns[0].id;
+                saveData();
+                renderCampaigns();
+                renderEmails();
+                closeImportModal();
+                alert('Data imported successfully!');
+            } catch (e) {
+                alert('Error importing data. Please check your JSON format.');
+            }
+        }
+
+        function copyAllEmails() {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            let allText = `NOOK EMAIL CAMPAIGN - ${campaign.name.toUpperCase()}\n\n`;
+            campaign.emails.forEach(email => {
+                allText += `\n${'='.repeat(60)}\n`;
+                allText += `DAY ${email.day}: ${email.title.toUpperCase()}\n`;
+                allText += `${'='.repeat(60)}\n\n`;
+
+                Object.entries(email.variants).forEach(([variant, data]) => {
+                    allText += `--- ${variant.toUpperCase()} VARIANT ---\n\n`;
+                    allText += `Subject: ${data.subject}\n`;
+                    allText += `Preview: ${data.preview}\n\n`;
+                    allText += `${data.body}\n\n`;
+                });
+            });
+
+            navigator.clipboard.writeText(allText).then(() => {
+                alert('Campaign emails copied to clipboard!');
+            });
+        }
+
+        function resetToDefaults() {
+            if (confirm('Reset current campaign to default content? This will erase all your changes for this campaign.')) {
+                const campaign = getCurrentCampaign();
+                if (campaign) {
+                    campaign.emails = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    saveData();
+                    renderEmails();
+                    alert('Campaign reset to defaults.');
+                }
+            }
+        }
+
+        function showSetupModal() {
+            document.getElementById('setupToken').value = CONFIG.githubToken;
+            document.getElementById('setupGistId').value = CONFIG.gistId;
+            document.getElementById('setupModal').classList.add('active');
+        }
+
+        function closeSetupModal() {
+            document.getElementById('setupModal').classList.remove('active');
+        }
+
+        async function saveSetup() {
+            const token = document.getElementById('setupToken').value.trim();
+            const gistId = document.getElementById('setupGistId').value.trim();
+
+            if (!token || !gistId) {
+                alert('Please provide both GitHub Token and Gist ID');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('githubToken', token);
+            localStorage.setItem('gistId', gistId);
+
+            // Update CONFIG
+            CONFIG.githubToken = token;
+            CONFIG.gistId = gistId;
+
+            closeSetupModal();
+
+            // Try to sync
+            const indicator = document.getElementById('saveIndicator');
+            indicator.textContent = 'Syncing with cloud...';
+            indicator.className = 'save-indicator saving';
+
+            // Load data from Gist
+            const gistData = await loadFromGist();
+
+            if (gistData) {
+                // Ask user if they want to use cloud data
+                const useCloud = confirm('Cloud data found! Do you want to load it? (Cancel to keep your local data and sync it to cloud)');
+                if (useCloud) {
+                    campaignsData = migrateFromV1(gistData);
+                    currentCampaignId = campaignsData.campaigns[0].id;
+                    renderCampaigns();
+                    renderEmails();
+                } else {
+                    // Save local data to cloud
+                    await saveToGist(campaignsData);
+                }
+                updateCloudStatus(true);
+                indicator.textContent = 'Cloud sync enabled ✓';
+                indicator.className = 'save-indicator saved';
+                setTimeout(() => {
+                    indicator.textContent = 'Cloud sync enabled';
+                    indicator.className = 'save-indicator';
+                }, 2000);
+            } else {
+                // If no data in gist or error, save current data to gist
+                const saved = await saveToGist(campaignsData);
+                if (saved) {
+                    updateCloudStatus(true);
+                    indicator.textContent = 'Cloud sync enabled ✓';
+                    indicator.className = 'save-indicator saved';
+                    setTimeout(() => {
+                        indicator.textContent = 'Cloud sync enabled';
+                        indicator.className = 'save-indicator';
+                    }, 2000);
+                } else {
+                    updateCloudStatus(false);
+                    indicator.textContent = 'Cloud sync failed';
+                    indicator.className = 'save-indicator';
+                    alert('Failed to connect to cloud. Please check your credentials.');
+                }
+            }
+        }
+
+        // Campaign Management Functions
+        function showAddCampaignModal() {
+            document.getElementById('campaignModalTitle').textContent = 'Create New Campaign';
+            document.getElementById('campaignNameInput').value = '';
+            document.getElementById('campaignDescInput').value = '';
+            document.getElementById('saveCampaignBtn').textContent = 'Create';
+            document.getElementById('saveCampaignBtn').setAttribute('data-mode', 'create');
+            document.getElementById('campaignModal').classList.add('active');
+        }
+
+        function editCampaignMetadata() {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            document.getElementById('campaignModalTitle').textContent = 'Edit Campaign';
+            document.getElementById('campaignNameInput').value = campaign.name;
+            document.getElementById('campaignDescInput').value = campaign.description || '';
+            document.getElementById('saveCampaignBtn').textContent = 'Save';
+            document.getElementById('saveCampaignBtn').setAttribute('data-mode', 'edit');
+            document.getElementById('campaignModal').classList.add('active');
+        }
+
+        function closeCampaignModal() {
+            document.getElementById('campaignModal').classList.remove('active');
+        }
+
+        function saveCampaignModal() {
+            const mode = document.getElementById('saveCampaignBtn').getAttribute('data-mode');
+            const name = document.getElementById('campaignNameInput').value.trim();
+            const description = document.getElementById('campaignDescInput').value.trim();
+
+            if (!name) {
+                alert('Please enter a campaign name');
+                return;
+            }
+
+            if (mode === 'create') {
+                // Create new campaign
+                const newCampaign = {
+                    id: generateCampaignId(),
+                    name: name,
+                    description: description,
+                    createdAt: new Date().toISOString(),
+                    emails: []
+                };
+                campaignsData.campaigns.push(newCampaign);
+                currentCampaignId = newCampaign.id;
+                currentEmailIndex = 0;
+                saveData();
+                renderCampaigns();
+                renderEmails();
+            } else {
+                // Edit existing campaign
+                const campaign = getCurrentCampaign();
+                if (campaign) {
+                    campaign.name = name;
+                    campaign.description = description;
+                    saveData();
+                    renderCampaigns();
+                }
+            }
+
+            closeCampaignModal();
+        }
+
+        function deleteCampaign() {
+            if (campaignsData.campaigns.length <= 1) {
+                alert('Cannot delete the last campaign. You must have at least one campaign.');
+                return;
+            }
+
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            if (confirm(`Delete campaign "${campaign.name}"? This cannot be undone.`)) {
+                const index = campaignsData.campaigns.findIndex(c => c.id === currentCampaignId);
+                campaignsData.campaigns.splice(index, 1);
+
+                // Switch to first campaign
+                currentCampaignId = campaignsData.campaigns[0].id;
+                currentEmailIndex = 0;
+
+                saveData();
+                renderCampaigns();
+                renderEmails();
+            }
+        }
+
+        // Email Management Functions
+        function addEmail() {
+            const campaign = getCurrentCampaign();
+            if (!campaign) return;
+
+            const day = prompt('Enter day number (e.g., 0, 2, 5, 10):');
+            if (day === null) return;
+
+            const title = prompt('Enter email title:');
+            if (!title) {
+                alert('Email title is required');
+                return;
+            }
+
+            const newEmail = {
+                day: parseInt(day) || 0,
+                title: title,
+                variants: {
+                    flooring: { subject: '', preview: '', body: '' },
+                    lighting: { subject: '', preview: '', body: '' },
+                    generic: { subject: '', preview: '', body: '' }
+                }
+            };
+
+            campaign.emails.push(newEmail);
+            saveData();
+            renderEmails();
+        }
+
+        function deleteEmail() {
+            const campaign = getCurrentCampaign();
+            if (!campaign || !campaign.emails) return;
+
+            if (campaign.emails.length === 0) {
+                alert('No emails to delete');
+                return;
+            }
+
+            const email = campaign.emails[currentEmailIndex];
+            if (!email) return;
+
+            if (confirm(`Delete email "Day ${email.day}: ${email.title}"? This cannot be undone.`)) {
+                campaign.emails.splice(currentEmailIndex, 1);
+
+                // Adjust current index if needed
+                if (currentEmailIndex >= campaign.emails.length) {
+                    currentEmailIndex = Math.max(0, campaign.emails.length - 1);
+                }
+
+                saveData();
+                renderEmails();
+            }
+        }
+
+        // Close modals on outside click
+        document.getElementById('importModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImportModal();
+            }
+        });
+
+        document.getElementById('setupModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSetupModal();
+            }
+        });
+
+        document.getElementById('campaignModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCampaignModal();
+            }
+        });
+
+        // Initialize on page load
+        initData().then(() => {
+            renderCampaigns();
+            renderEmails();
+        });
+    </script>
+</body>
+</html>

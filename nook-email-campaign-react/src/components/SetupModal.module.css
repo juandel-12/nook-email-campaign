@@ -1,0 +1,49 @@
+.setupModal {
+  /* Container styles if needed */
+}
+
+.description {
+  margin-bottom: 20px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.instructions {
+  margin-top: 30px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.instructions h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.instructions ol {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+  font-size: 13px;
+  color: #555;
+}
+
+.instructions a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.instructions a:hover {
+  text-decoration: underline;
+}

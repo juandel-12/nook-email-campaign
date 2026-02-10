@@ -1,0 +1,20 @@
+.campaignInfo {
+  margin-top: 15px;
+}
+
+.campaignInfo h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.campaignInfo p {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.campaignInfo span {
+  font-size: 12px;
+  color: #999;
+}
