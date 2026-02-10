@@ -18,6 +18,7 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   const [bodyMode, setBodyMode] = useState('visual'); // 'visual' or 'code'
   const textareaRef = useRef(null);
   const contentEditableRef = useRef(null);
+  const lastBodyValueRef = useRef('');
 
   // History state for undo/redo
   const [history, setHistory] = useState({
@@ -50,6 +51,51 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
       setRawHtml(raw);
     }
   }, [email, variant, config.htmlTemplate]);
+
+  // Update contentEditable only when body changes from external source (not from typing)
+  useEffect(() => {
+    if (bodyMode === 'visual' && contentEditableRef.current) {
+      const newBody = variantData.body || '';
+      // Only update if the content is different and it's not from user input
+      if (contentEditableRef.current.innerHTML !== newBody && lastBodyValueRef.current !== newBody) {
+        const sel = window.getSelection();
+        const hadFocus = document.activeElement === contentEditableRef.current;
+        let cursorPosition = null;
+
+        // Save cursor position if element has focus
+        if (hadFocus && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          cursorPosition = {
+            startContainer: range.startContainer,
+            startOffset: range.startOffset,
+            endContainer: range.endContainer,
+            endOffset: range.endOffset
+          };
+        }
+
+        // Update content
+        contentEditableRef.current.innerHTML = newBody;
+        lastBodyValueRef.current = newBody;
+
+        // Restore cursor position
+        if (hadFocus && cursorPosition) {
+          setTimeout(() => {
+            try {
+              const newRange = document.createRange();
+              newRange.setStart(cursorPosition.startContainer, cursorPosition.startOffset);
+              newRange.setEnd(cursorPosition.endContainer, cursorPosition.endOffset);
+              sel.removeAllRanges();
+              sel.addRange(newRange);
+              contentEditableRef.current?.focus();
+            } catch (e) {
+              // If cursor position is no longer valid, place at end
+              contentEditableRef.current?.focus();
+            }
+          }, 0);
+        }
+      }
+    }
+  }, [variantData.body, bodyMode]);
 
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -85,6 +131,11 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   if (!campaign || !email) return null;
 
   const handleChange = (field, value) => {
+    // Track the last body value to prevent unnecessary updates
+    if (field === 'body') {
+      lastBodyValueRef.current = value;
+    }
+
     // Update history with debouncing (500ms)
     clearTimeout(historyTimeoutRef.current[field]);
     historyTimeoutRef.current[field] = setTimeout(() => {
@@ -442,7 +493,6 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
               contentEditable
               suppressContentEditableWarning
               onInput={(e) => handleChange('body', e.currentTarget.innerHTML)}
-              dangerouslySetInnerHTML={{ __html: variantData.body }}
               className="min-h-[400px] p-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 overflow-auto"
               style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '16px', lineHeight: '1.5' }}
             />
