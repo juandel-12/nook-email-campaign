@@ -19,6 +19,8 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   const textareaRef = useRef(null);
   const contentEditableRef = useRef(null);
   const lastBodyValueRef = useRef('');
+  const iframeRef = useRef(null);
+  const lastScrollPosition = useRef({ x: 0, y: 0 });
 
   // History state for undo/redo
   const [history, setHistory] = useState({
@@ -45,12 +47,49 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   // Update rendered HTML whenever email content changes
   useEffect(() => {
     if (config.htmlTemplate && email) {
+      // Save current scroll position before update
+      if (iframeRef.current?.contentWindow) {
+        try {
+          const win = iframeRef.current.contentWindow;
+          lastScrollPosition.current = {
+            x: win.scrollX || win.pageXOffset || 0,
+            y: win.scrollY || win.pageYOffset || 0
+          };
+        } catch (e) {
+          // Ignore cross-origin errors
+        }
+      }
+
       const html = renderEmailTemplate(config.htmlTemplate, email, variant);
       const raw = renderEmailTemplateRaw(config.htmlTemplate, email, variant);
       setRenderedHtml(html);
       setRawHtml(raw);
     }
   }, [email, variant, config.htmlTemplate]);
+
+  // Restore iframe scroll position after content updates
+  useEffect(() => {
+    if (renderedHtml && iframeRef.current) {
+      // Wait for iframe to load new content
+      const iframe = iframeRef.current;
+      const restoreScroll = () => {
+        try {
+          const win = iframe.contentWindow;
+          if (win && lastScrollPosition.current) {
+            win.scrollTo(lastScrollPosition.current.x, lastScrollPosition.current.y);
+          }
+        } catch (e) {
+          // Ignore cross-origin errors
+        }
+      };
+
+      // Try to restore immediately and also after a short delay
+      restoreScroll();
+      const timeoutId = setTimeout(restoreScroll, 50);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [renderedHtml]);
 
   // Update contentEditable only when body changes from external source (not from typing)
   useEffect(() => {
@@ -540,6 +579,7 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
           <TabsContent value="preview" className="mt-3">
             <div className="bg-muted rounded-lg overflow-hidden border border-border" style={{ height: 'calc(100vh - 380px)', minHeight: '500px' }}>
               <iframe
+                ref={iframeRef}
                 srcDoc={renderedHtml}
                 title="Email Preview"
                 className="w-full h-full"
