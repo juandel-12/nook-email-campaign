@@ -1,8 +1,8 @@
 # Nook Email Campaign Editor - Setup Guide
 
-This guide will walk you through setting up the Nook Email Campaign Editor with cloud sync and password protection for your team (2-5 people).
+This guide will walk you through setting up the Nook Email Campaign Editor with cloud sync for your team (2-5 people).
 
-**Total Setup Time**: ~15-20 minutes
+**Total Setup Time**: ~10-15 minutes
 **Cost**: $0/month
 
 ---
@@ -12,11 +12,9 @@ This guide will walk you through setting up the Nook Email Campaign Editor with 
 Your email campaign editor uses:
 - **GitHub Pages** - Free static hosting
 - **GitHub Gist** - Free cloud database (JSON storage)
-- **StatiCrypt** - Free password encryption (AES-256)
 - **GitHub API** - Free data synchronization
 
 All team members share:
-- One password (to decrypt the page)
 - One GitHub Personal Access Token (to access the Gist)
 - One Gist ID (where campaign data is stored)
 
@@ -116,50 +114,7 @@ If you want to embed the Gist ID directly (token should still be entered by user
 
 ---
 
-## Step 4: Password Protect with StatiCrypt
-
-StatiCrypt encrypts your HTML file so only people with the password can access it.
-
-### Instructions:
-
-1. **Install StatiCrypt**
-   ```bash
-   npm install -g staticrypt
-   ```
-
-2. **Encrypt the HTML File**
-   ```bash
-   cd /Volumes/Extreme\ SSD/Apps/nook-email-campaign
-
-   staticrypt index.html \
-     --password "YOUR_STRONG_PASSWORD" \
-     --title "Nook Email Campaign Editor" \
-     --instructions "Enter the team password to access the editor" \
-     --output index.encrypted.html
-   ```
-
-   Replace `YOUR_STRONG_PASSWORD` with a strong password (12+ characters).
-
-3. **Verify Encryption**
-   - Open `index.encrypted.html` in your browser
-   - You should see a password prompt
-   - Enter your password to decrypt
-
-4. **Prepare for Deployment**
-   ```bash
-   # Copy encrypted version as index.html for deployment
-   cp index.encrypted.html index.html
-   ```
-
-**Important**: Keep the unencrypted `index.html` as `index.original.html` for future edits:
-```bash
-mv index.html index.original.html
-mv index.encrypted.html index.html
-```
-
----
-
-## Step 5: Deploy to GitHub Pages
+## Step 4: Deploy to GitHub Pages
 
 Deploy your password-protected app to GitHub Pages for free hosting.
 
@@ -177,7 +132,7 @@ Deploy your password-protected app to GitHub Pages for free hosting.
    cd /Volumes/Extreme\ SSD/Apps/nook-email-campaign
 
    git add index.html
-   git commit -m "Deploy password-protected campaign editor
+   git commit -m "Deploy campaign editor
 
    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
    git push origin main
@@ -193,9 +148,9 @@ Deploy your password-protected app to GitHub Pages for free hosting.
 
 ---
 
-## Step 6: Share Credentials with Team
+## Step 5: Share Credentials with Team
 
-All team members need three things to access the editor:
+All team members need two things to access the editor:
 
 ### What to Share:
 
@@ -204,23 +159,17 @@ All team members need three things to access the editor:
    https://juandel-12.github.io/nook-email-campaign/
    ```
 
-2. **Password** (for StatiCrypt)
-   ```
-   The password you set in Step 4
-   ```
-
-3. **GitHub Credentials** (for Cloud Sync)
+2. **GitHub Credentials** (for Cloud Sync)
    - **GitHub Token (PAT)**: The `ghp_...` token from Step 2
    - **Gist ID**: The Gist ID from Step 1
 
 ### How Team Members Access:
 
 1. Navigate to the app URL
-2. Enter the password to decrypt the page
-3. Click "⚙️ Cloud Sync Setup"
-4. Enter GitHub Token and Gist ID
-5. Click "Save & Sync"
-6. Choose to load data from cloud
+2. Click "⚙️ Cloud Sync Setup"
+3. Enter GitHub Token and Gist ID
+4. Click "Save & Sync"
+5. Choose to load data from cloud
 
 **First-time setup**: Each team member only needs to configure this once. The credentials are saved in their browser.
 
@@ -232,7 +181,6 @@ All team members need three things to access the editor:
 
 1. **Access the App**
    - Go to https://juandel-12.github.io/nook-email-campaign/
-   - Enter password (if not cached)
 
 2. **Make Edits**
    - Click day buttons to switch between emails
@@ -305,14 +253,6 @@ This means:
 3. Check the Gist directly at https://gist.github.com/{username}/{GIST_ID} to see latest data
 4. Verify everyone has internet connection
 
-### Password forgotten
-
-**Solution:**
-1. Go to your local unencrypted file: `index.original.html`
-2. Re-encrypt with a new password using StatiCrypt (Step 4)
-3. Redeploy to GitHub Pages (Step 5)
-4. Share new password with team
-
 ### Want to change Gist or Token
 
 **Solution:**
@@ -324,13 +264,6 @@ This means:
 ---
 
 ## Security Best Practices
-
-### Password Management
-
-1. **Use a strong password** (12+ characters, mix of letters/numbers/symbols)
-2. **Share password securely** (1Password, LastPass, or encrypted message)
-3. **Rotate password** every 3-6 months
-4. **Don't commit password** to the repository
 
 ### Token Management
 
@@ -352,74 +285,17 @@ This means:
 
 ### To make changes to the editor itself:
 
-1. **Edit the unencrypted version**
+1. **Edit index.html**
    ```bash
-   # Make changes to index.original.html
+   # Make changes to index.html
    ```
 
-2. **Re-encrypt**
-   ```bash
-   staticrypt index.original.html \
-     --password "YOUR_PASSWORD" \
-     --title "Nook Email Campaign Editor" \
-     --instructions "Enter the team password to access the editor" \
-     --output index.html
-   ```
-
-3. **Deploy**
+2. **Deploy**
    ```bash
    git add index.html
    git commit -m "Update editor"
    git push origin main
    ```
-
----
-
-## Advanced: Automation with GitHub Actions
-
-For automatic deployment on every push, create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-
-      - name: Install StatiCrypt
-        run: npm install -g staticrypt
-
-      - name: Encrypt index.html
-        run: |
-          staticrypt index.html \
-            --password "${{ secrets.STATICRYPT_PASSWORD }}" \
-            --title "Nook Email Campaign Editor" \
-            --instructions "Enter the team password to access the editor" \
-            --output index.encrypted.html
-          mv index.encrypted.html index.html
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-```
-
-Add your password as a repository secret at:
-Settings → Secrets → Actions → New repository secret
-- Name: `STATICRYPT_PASSWORD`
-- Value: Your password
 
 ---
 
@@ -438,16 +314,14 @@ For issues or questions:
 - [ ] Created GitHub Gist with campaign data
 - [ ] Generated GitHub Personal Access Token (PAT) with `gist` scope
 - [ ] Configured app with Gist ID and PAT
-- [ ] Installed StatiCrypt (`npm install -g staticrypt`)
-- [ ] Encrypted index.html with password
 - [ ] Deployed to GitHub Pages
-- [ ] Shared URL, password, token, and Gist ID with team
+- [ ] Shared URL, token, and Gist ID with team
 - [ ] Verified team members can access and edit
 - [ ] Tested that changes sync across team
 
 **Estimated Total Cost**: $0/month 🎉
 
-**Estimated Setup Time**: 15-20 minutes ⚡
+**Estimated Setup Time**: 10-15 minutes ⚡
 
 **Team Size**: 2-5 people 👥
 
