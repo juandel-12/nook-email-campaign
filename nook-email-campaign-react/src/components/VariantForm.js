@@ -7,7 +7,7 @@ import { Separator } from './ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { renderEmailTemplate, renderEmailTemplateRaw } from '../utils/emailTemplate';
-import { Copy, Check, Bold, Italic, Link as LinkIcon, Code } from 'lucide-react';
+import { Copy, Check, Bold, Italic, Link as LinkIcon, Code, Undo, Redo } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 
 const VariantForm = ({ campaignId, emailIndex, variant }) => {
@@ -19,9 +19,27 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
   const textareaRef = useRef(null);
   const contentEditableRef = useRef(null);
 
+  // History state for undo/redo
+  const [history, setHistory] = useState({
+    subject: { past: [], present: '', future: [] },
+    preview: { past: [], present: '', future: [] },
+    body: { past: [], present: '', future: [] }
+  });
+  const historyTimeoutRef = useRef({});
+
   const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
   const email = campaign?.emails[emailIndex];
   const variantData = email?.variants[variant] || { subject: '', preview: '', body: '' };
+
+  // Initialize history when variant data loads
+  useEffect(() => {
+    setHistory({
+      subject: { past: [], present: variantData.subject || '', future: [] },
+      preview: { past: [], present: variantData.preview || '', future: [] },
+      body: { past: [], present: variantData.body || '', future: [] }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId, emailIndex, variant]); // Reset history when switching emails/variants
 
   // Update rendered HTML whenever email content changes
   useEffect(() => {
@@ -33,11 +51,104 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
     }
   }, [email, variant, config.htmlTemplate]);
 
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl/Cmd + Z for undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        const activeElement = document.activeElement;
+        if (activeElement?.id === 'subject') handleUndo('subject');
+        else if (activeElement?.id === 'preview') handleUndo('preview');
+        else if (activeElement === contentEditableRef.current || activeElement === textareaRef.current) {
+          handleUndo('body');
+        }
+      }
+      // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y for redo
+      if ((e.ctrlKey || e.metaKey) && ((e.shiftKey && e.key === 'z') || e.key === 'y')) {
+        e.preventDefault();
+        const activeElement = document.activeElement;
+        if (activeElement?.id === 'subject') handleRedo('subject');
+        else if (activeElement?.id === 'preview') handleRedo('preview');
+        else if (activeElement === contentEditableRef.current || activeElement === textareaRef.current) {
+          handleRedo('body');
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history]);
+
   // Early return after all hooks
   if (!campaign || !email) return null;
 
   const handleChange = (field, value) => {
+    // Update history with debouncing (500ms)
+    clearTimeout(historyTimeoutRef.current[field]);
+    historyTimeoutRef.current[field] = setTimeout(() => {
+      setHistory(prev => {
+        const fieldHistory = prev[field];
+        // Only add to history if value changed
+        if (fieldHistory.present === value) return prev;
+
+        return {
+          ...prev,
+          [field]: {
+            past: [...fieldHistory.past, fieldHistory.present],
+            present: value,
+            future: [] // Clear future when new change is made
+          }
+        };
+      });
+    }, 500);
+
     updateEmail(campaignId, emailIndex, variant, field, value);
+  };
+
+  const handleUndo = (field) => {
+    setHistory(prev => {
+      const fieldHistory = prev[field];
+      if (fieldHistory.past.length === 0) return prev;
+
+      const previous = fieldHistory.past[fieldHistory.past.length - 1];
+      const newPast = fieldHistory.past.slice(0, -1);
+
+      // Update the actual field value
+      updateEmail(campaignId, emailIndex, variant, field, previous);
+
+      return {
+        ...prev,
+        [field]: {
+          past: newPast,
+          present: previous,
+          future: [fieldHistory.present, ...fieldHistory.future]
+        }
+      };
+    });
+  };
+
+  const handleRedo = (field) => {
+    setHistory(prev => {
+      const fieldHistory = prev[field];
+      if (fieldHistory.future.length === 0) return prev;
+
+      const next = fieldHistory.future[0];
+      const newFuture = fieldHistory.future.slice(1);
+
+      // Update the actual field value
+      updateEmail(campaignId, emailIndex, variant, field, next);
+
+      return {
+        ...prev,
+        [field]: {
+          past: [...fieldHistory.past, fieldHistory.present],
+          present: next,
+          future: newFuture
+        }
+      };
+    });
   };
 
   const handleCopyHtml = async () => {
@@ -154,7 +265,33 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
       {/* Left column: Form fields */}
       <div className="space-y-6">
         <div className="grid w-full gap-3">
-          <Label htmlFor="subject">Subject Line</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="subject">Subject Line</Label>
+            <div className="flex gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleUndo('subject')}
+                title="Undo (Ctrl+Z)"
+                disabled={history.subject.past.length === 0}
+                className="h-7 w-7 p-0"
+              >
+                <Undo className="w-3 h-3" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRedo('subject')}
+                title="Redo (Ctrl+Shift+Z)"
+                disabled={history.subject.future.length === 0}
+                className="h-7 w-7 p-0"
+              >
+                <Redo className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
           <Input
             id="subject"
             value={variantData.subject}
@@ -167,7 +304,33 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
         </div>
 
         <div className="grid w-full gap-3">
-          <Label htmlFor="preview">Preview Text</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="preview">Preview Text</Label>
+            <div className="flex gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleUndo('preview')}
+                title="Undo (Ctrl+Z)"
+                disabled={history.preview.past.length === 0}
+                className="h-7 w-7 p-0"
+              >
+                <Undo className="w-3 h-3" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRedo('preview')}
+                title="Redo (Ctrl+Shift+Z)"
+                disabled={history.preview.future.length === 0}
+                className="h-7 w-7 p-0"
+              >
+                <Redo className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
           <Input
             id="preview"
             value={variantData.preview}
@@ -202,6 +365,27 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
             </div>
           </div>
           <div className="flex gap-1 mb-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleUndo('body')}
+              title="Undo (Ctrl+Z)"
+              disabled={history.body.past.length === 0}
+            >
+              <Undo className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleRedo('body')}
+              title="Redo (Ctrl+Shift+Z)"
+              disabled={history.body.future.length === 0}
+            >
+              <Redo className="w-4 h-4" />
+            </Button>
+            <Separator orientation="vertical" className="h-8" />
             <Button
               type="button"
               variant="outline"
@@ -250,6 +434,7 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
               onChange={(e) => handleChange('body', e.target.value)}
               placeholder="Email content goes here..."
               className="min-h-[400px] font-mono"
+              style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '16px', lineHeight: '1.5' }}
             />
           ) : (
             <div

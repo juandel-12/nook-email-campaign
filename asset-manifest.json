@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/nook-email-campaign/static/css/main.a0ce17ad.css",
-    "main.js": "/nook-email-campaign/static/js/main.6da5dbba.js",
+    "main.js": "/nook-email-campaign/static/js/main.8c52b350.js",
     "static/js/453.a9301d22.chunk.js": "/nook-email-campaign/static/js/453.a9301d22.chunk.js",
     "index.html": "/nook-email-campaign/index.html",
     "main.a0ce17ad.css.map": "/nook-email-campaign/static/css/main.a0ce17ad.css.map",
-    "main.6da5dbba.js.map": "/nook-email-campaign/static/js/main.6da5dbba.js.map",
+    "main.8c52b350.js.map": "/nook-email-campaign/static/js/main.8c52b350.js.map",
     "453.a9301d22.chunk.js.map": "/nook-email-campaign/static/js/453.a9301d22.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a0ce17ad.css",
-    "static/js/main.6da5dbba.js"
+    "static/js/main.8c52b350.js"
   ]
 }
