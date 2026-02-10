@@ -1,8 +1,8 @@
 import React from 'react';
 import { CampaignProvider, useCampaignContext } from './contexts/CampaignContext';
 import { useGistSync } from './hooks/useGistSync';
-import Header from './components/Header';
-import CampaignSelector from './components/CampaignSelector';
+import NewHeader from './components/NewHeader';
+import NewCampaignSelector from './components/NewCampaignSelector';
 import EmailEditor from './components/EmailEditor';
 import './App.css';
 
@@ -18,10 +18,10 @@ const AppContent = () => {
   useGistSync(campaignsData, config, setSaveStatus, importData);
 
   return (
-    <div className="App">
-      <div className="container">
-        <Header />
-        <CampaignSelector />
+    <div className="min-h-screen bg-background">
+      <NewHeader />
+      <div className="container mx-auto max-w-7xl px-4 pb-8">
+        <NewCampaignSelector />
         <EmailEditor />
       </div>
     </div>

@@ -6,7 +6,7 @@ import ImportModal from './ImportModal';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './Header.module.css';
 
-const Header = () => {
+const Header = ({ onBackToHome }) => {
   const { campaignsData, currentCampaignId, exportData, resetToDefaults, saveStatus, lastSaved } = useCampaignContext();
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -73,6 +73,11 @@ const Header = () => {
       </div>
 
       <div className={styles.controls}>
+        {onBackToHome && (
+          <Button variant="secondary" onClick={onBackToHome}>
+            ← Back to Home
+          </Button>
+        )}
         <Button variant="primary" onClick={() => setShowSetupModal(true)}>
           Cloud Setup
         </Button>
