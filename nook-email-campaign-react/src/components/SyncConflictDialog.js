@@ -11,9 +11,9 @@ const SyncConflictDialog = ({ onKeepLocal, onUseCloud }) => {
             <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Cloud Data Differs</h2>
+            <h2 className="text-lg font-semibold">Sync Conflict Detected</h2>
             <p className="text-sm text-muted-foreground">
-              Your local data doesn't match what's saved in the cloud.
+              Someone else updated the cloud data while you were editing.
             </p>
           </div>
         </div>
@@ -32,7 +32,7 @@ const SyncConflictDialog = ({ onKeepLocal, onUseCloud }) => {
             <div className="text-left">
               <div className="font-medium">Keep Local</div>
               <div className="text-xs text-muted-foreground font-normal">
-                Use your local data and overwrite the cloud
+                Override the cloud with your local changes
               </div>
             </div>
           </Button>
@@ -46,7 +46,7 @@ const SyncConflictDialog = ({ onKeepLocal, onUseCloud }) => {
             <div className="text-left">
               <div className="font-medium">Use Cloud</div>
               <div className="text-xs text-muted-foreground font-normal">
-                Replace your local data with the cloud version
+                Discard your local changes and use the cloud version
               </div>
             </div>
           </Button>

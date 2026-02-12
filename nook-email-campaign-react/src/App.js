@@ -21,8 +21,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus, MoreHorizontal, Cloud } from 'lucide-react';
 import './App.css';
+
+const CloudSetupScreen = ({ onOpenSetup }) => {
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-background">
+      <div className="text-center max-w-md px-6">
+        <div className="flex justify-center mb-6">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <Cloud className="h-8 w-8 text-primary" />
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold mb-2">Cloud Setup Required</h1>
+        <p className="text-muted-foreground mb-6">
+          Please configure cloud sync to continue. Your campaign data will be stored in a private GitHub Gist shared across your team.
+        </p>
+        <Button onClick={onOpenSetup} size="lg">
+          Configure Cloud Sync
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const AppContent = () => {
   const {
@@ -38,6 +59,7 @@ const AppContent = () => {
     lastSaved,
     updateCampaign,
     deleteCampaign,
+    cloudSyncEnabled,
   } = useCampaignContext();
 
   const [showSetupModal, setShowSetupModal] = useState(false);
@@ -50,9 +72,7 @@ const AppContent = () => {
   const [editingField, setEditingField] = useState(null); // null | 'name' | 'description'
   const [editValue, setEditValue] = useState('');
 
-  // Initialize Gist sync
-  const { syncConflict, resolveKeepLocal, resolveUseCloud } = useGistSync(campaignsData, config, setSaveStatus, importData);
-
+  // Define handleExport before early returns
   const handleExport = () => {
     const jsonData = exportData();
     const blob = new Blob([jsonData], { type: 'application/json' });
@@ -65,6 +85,37 @@ const AppContent = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  // Initialize Gist sync
+  const { syncConflict, resolveKeepLocal, resolveUseCloud, isLoading } = useGistSync(campaignsData, config, setSaveStatus, importData);
+
+  // Hard-block app if cloud is not configured
+  if (!cloudSyncEnabled) {
+    return (
+      <>
+        <CloudSetupScreen onOpenSetup={() => setShowSetupModal(true)} />
+        <SetupModal
+          isOpen={showSetupModal}
+          onClose={() => setShowSetupModal(false)}
+          onExport={handleExport}
+          onImport={() => setShowImportModal(true)}
+        />
+        <ImportModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} />
+      </>
+    );
+  }
+
+  // Show loading while fetching cloud data
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading from cloud...</p>
+        </div>
+      </div>
+    );
+  }
 
   // ActiveCampaign push handler (single email mode only)
   const handleSinglePushToAC = () => {

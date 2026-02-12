@@ -36,15 +36,15 @@ export const loadFromGist = async (gistId, githubToken) => {
     const gist = await response.json();
     const files = gist.files;
 
-    // Get the first file (should be nook-campaign.json)
-    const fileKey = Object.keys(files)[0];
+    // Read from the exact file we write to; fall back to first file for legacy gists
+    const fileKey = files[GIST_FILENAME] ? GIST_FILENAME : Object.keys(files)[0];
     if (!fileKey || !files[fileKey].content) {
       console.error('No content found in Gist');
       return null;
     }
 
     const data = JSON.parse(files[fileKey].content);
-    console.log('Successfully loaded data from Gist');
+    console.log('Successfully loaded data from Gist, file:', fileKey);
     return data;
   } catch (error) {
     console.error('Error loading from Gist:', error);
