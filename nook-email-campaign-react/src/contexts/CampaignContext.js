@@ -19,6 +19,7 @@ const HTML_TEMPLATE_KEY = 'htmlEmailTemplate';
 const AC_API_URL_KEY = 'acApiUrl';
 const AC_API_KEY_KEY = 'acApiKey';
 const AC_PROXY_URL_KEY = 'acProxyUrl';
+const CUSTOM_TEMPLATES_KEY = 'nookCustomTemplates';
 
 export const CampaignProvider = ({ children }) => {
   // Core data state
@@ -35,7 +36,8 @@ export const CampaignProvider = ({ children }) => {
     saveDebounce: 2000,
     acApiUrl: localStorage.getItem(AC_API_URL_KEY) || '',
     acApiKey: localStorage.getItem(AC_API_KEY_KEY) || '',
-    acProxyUrl: localStorage.getItem(AC_PROXY_URL_KEY) || ''
+    acProxyUrl: localStorage.getItem(AC_PROXY_URL_KEY) || '',
+    customTemplates: JSON.parse(localStorage.getItem(CUSTOM_TEMPLATES_KEY) || '[]')
   });
 
   // Status state
@@ -391,6 +393,38 @@ export const CampaignProvider = ({ children }) => {
     }
   }, []);
 
+  const addCampaignsFromJSON = useCallback((jsonData) => {
+    try {
+      const parsed = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      const validated = ensureV2Format(parsed);
+
+      if (validated.campaigns.length === 0) {
+        return { success: false, message: 'No campaigns found in the file.' };
+      }
+
+      // Add campaigns with new IDs to avoid collisions
+      const newCampaigns = validated.campaigns.map(c => ({
+        ...c,
+        id: `campaign-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        createdAt: c.createdAt || new Date().toISOString()
+      }));
+
+      setCampaignsData(prev => ({
+        ...prev,
+        campaigns: [...prev.campaigns, ...newCampaigns]
+      }));
+
+      // Select the first newly added campaign
+      setCurrentCampaignId(newCampaigns[0].id);
+      setCurrentEmailIndex(0);
+
+      return { success: true, count: newCampaigns.length };
+    } catch (error) {
+      console.error('Error adding campaigns from JSON:', error);
+      return { success: false, message: 'Invalid JSON format.' };
+    }
+  }, []);
+
   const exportData = useCallback(() => {
     return JSON.stringify(campaignsData, null, 2);
   }, [campaignsData]);
@@ -426,6 +460,9 @@ export const CampaignProvider = ({ children }) => {
       }
       if (newConfig.acProxyUrl !== undefined) {
         localStorage.setItem(AC_PROXY_URL_KEY, newConfig.acProxyUrl);
+      }
+      if (newConfig.customTemplates !== undefined) {
+        localStorage.setItem(CUSTOM_TEMPLATES_KEY, JSON.stringify(newConfig.customTemplates));
       }
 
       return updated;
@@ -468,6 +505,7 @@ export const CampaignProvider = ({ children }) => {
 
     // Data actions
     importData,
+    addCampaignsFromJSON,
     exportData,
     resetToDefaults,
     setAcMessageId,

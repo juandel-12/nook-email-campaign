@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Mail, Plus, Download, Upload, Copy, RotateCcw, Github, Cloud } from 'lucide-react';
+import { Mail, Plus, FilePlus, Cloud } from 'lucide-react';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -22,11 +22,8 @@ import {
 
 export function AppSidebar({
   onOpenSetup,
-  onExport,
-  onImport,
-  onCopyAll,
-  onReset,
   onAddCampaign,
+  onAddFromJSON,
   ...props
 }) {
   const {
@@ -121,46 +118,14 @@ export function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={onExport}>
-                  <Download className="w-4 h-4" />
-                  <span>Download JSON</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={onImport}>
-                  <Upload className="w-4 h-4" />
-                  <span>Import JSON</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={onCopyAll}>
-                  <Copy className="w-4 h-4" />
-                  <span>Copy All</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={onReset} className="text-destructive">
-                  <RotateCcw className="w-4 h-4" />
-                  <span>Reset to Defaults</span>
+                <SidebarMenuButton onClick={onAddFromJSON}>
+                  <FilePlus className="w-4 h-4" />
+                  <span>Add from JSON</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a
-                href="https://github.com/juandel-12/nook-email-campaign"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="w-4 h-4" />
-                <span>View on GitHub</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
         <div className="px-3 pb-2 text-[10px] text-muted-foreground/50">v1.1.0</div>
       </SidebarFooter>
 

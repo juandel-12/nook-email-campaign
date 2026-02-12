@@ -8,14 +8,17 @@ import { ThemeToggle } from './components/ui/theme-toggle';
 import StatusIndicator from './components/StatusIndicator';
 import SetupModal from './components/SetupModal';
 import ImportModal from './components/ImportModal';
+import AddFromJSONModal from './components/AddFromJSONModal';
 import CampaignModal from './components/CampaignModal';
 import ActiveCampaignPushModal from './components/ActiveCampaignPushModal';
+import SyncConflictDialog from './components/SyncConflictDialog';
 import EmailContent from './components/EmailContent';
 import { Button } from './components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
 import { Plus, MoreHorizontal } from 'lucide-react';
@@ -31,15 +34,16 @@ const AppContent = () => {
     setSaveStatus,
     importData,
     exportData,
-    resetToDefaults,
     saveStatus,
     lastSaved,
     updateCampaign,
+    deleteCampaign,
   } = useCampaignContext();
 
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
+  const [showAddFromJSONModal, setShowAddFromJSONModal] = useState(false);
   const [showAddEmailModal, setShowAddEmailModal] = useState(false);
   const [showACPushModal, setShowACPushModal] = useState(false);
   const [acPushMode, setAcPushMode] = useState('single');
@@ -47,7 +51,7 @@ const AppContent = () => {
   const [editValue, setEditValue] = useState('');
 
   // Initialize Gist sync
-  useGistSync(campaignsData, config, setSaveStatus, importData);
+  const { syncConflict, resolveKeepLocal, resolveUseCloud } = useGistSync(campaignsData, config, setSaveStatus, importData);
 
   const handleExport = () => {
     const jsonData = exportData();
@@ -60,39 +64,6 @@ const AppContent = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
-
-  const handleCopyAll = () => {
-    const campaign = getCurrentCampaign();
-    if (!campaign) {
-      alert('No campaign selected');
-      return;
-    }
-
-    let text = `Campaign: ${campaign.name}\n\n`;
-    campaign.emails.forEach(email => {
-      text += `=== Day ${email.day}: ${email.title} ===\n\n`;
-      ['flooring', 'lighting', 'generic'].forEach(variant => {
-        const v = email.variants[variant];
-        text += `[${variant.toUpperCase()}]\n`;
-        text += `Subject: ${v.subject}\n`;
-        text += `Preview: ${v.preview}\n`;
-        text += `Body:\n${v.body}\n\n`;
-      });
-      text += '\n---\n\n';
-    });
-
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Copied all emails to clipboard!');
-    }).catch(() => {
-      alert('Failed to copy to clipboard');
-    });
-  };
-
-  const handleReset = () => {
-    if (window.confirm('Reset to default campaign? This will replace all your data.')) {
-      resetToDefaults();
-    }
   };
 
   // ActiveCampaign push handler (single email mode only)
@@ -133,11 +104,8 @@ const AppContent = () => {
     <SidebarProvider>
       <AppSidebar
         onOpenSetup={() => setShowSetupModal(true)}
-        onExport={handleExport}
-        onImport={() => setShowImportModal(true)}
-        onCopyAll={handleCopyAll}
-        onReset={handleReset}
         onAddCampaign={() => setShowAddCampaignModal(true)}
+        onAddFromJSON={() => setShowAddFromJSONModal(true)}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background">
@@ -189,6 +157,17 @@ const AppContent = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => startEditing('description')}>
                         Update Description
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => {
+                          if (window.confirm(`Delete "${campaign.name}"? This cannot be undone.`)) {
+                            deleteCampaign(currentCampaignId);
+                          }
+                        }}
+                      >
+                        Delete Campaign
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -265,8 +244,15 @@ const AppContent = () => {
         </div>
       </SidebarInset>
 
-      <SetupModal isOpen={showSetupModal} onClose={() => setShowSetupModal(false)} />
+      {syncConflict && (
+        <SyncConflictDialog
+          onKeepLocal={resolveKeepLocal}
+          onUseCloud={resolveUseCloud}
+        />
+      )}
+      <SetupModal isOpen={showSetupModal} onClose={() => setShowSetupModal(false)} onExport={handleExport} onImport={() => setShowImportModal(true)} />
       <ImportModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} />
+      <AddFromJSONModal isOpen={showAddFromJSONModal} onClose={() => setShowAddFromJSONModal(false)} />
       <CampaignModal
         isOpen={showAddCampaignModal}
         onClose={() => setShowAddCampaignModal(false)}

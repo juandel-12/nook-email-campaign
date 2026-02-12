@@ -1,37 +1,53 @@
 /**
  * useGistSync Hook
  * Handles automatic synchronization with GitHub Gist
+ * Shows a conflict dialog when cloud and local data differ on load
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { loadFromGist, saveToGist } from '../utils/gistApi';
 import { useDebounce } from './useDebounce';
 
+// Compare two campaign data objects to detect meaningful differences
+const dataHasChanged = (local, cloud) => {
+  if (!local || !cloud) return true;
+  return JSON.stringify(local) !== JSON.stringify(cloud);
+};
+
 export const useGistSync = (campaignsData, config, setSaveStatus, importData) => {
   const isInitialMount = useRef(true);
+  const conflictResolved = useRef(false);
+
+  // Conflict state: holds cloud data while waiting for user decision
+  const [syncConflict, setSyncConflict] = useState(null); // null | { cloudData }
 
   // Debounce the campaigns data to avoid too frequent saves
   const debouncedData = useDebounce(campaignsData, config.saveDebounce);
 
-  // Load from Gist on mount (if configured)
+  // Load from Gist on mount (if configured) — detect conflicts instead of auto-importing
   useEffect(() => {
     const loadInitialData = async () => {
       if (!config.gistId || !config.githubToken) {
         console.log('No Gist credentials configured, skipping cloud load');
+        conflictResolved.current = true;
         return;
       }
 
       console.log('Loading initial data from Gist...');
-      const data = await loadFromGist(config.gistId, config.githubToken);
+      const cloudData = await loadFromGist(config.gistId, config.githubToken);
 
-      if (data) {
-        // Only import if we got valid data
-        const success = importData(data);
-        if (success) {
-          console.log('Successfully loaded cloud data on init');
+      if (cloudData) {
+        // Check if cloud data differs from local data
+        if (dataHasChanged(campaignsData, cloudData)) {
+          console.log('Cloud data differs from local — asking user to resolve');
+          setSyncConflict({ cloudData });
+        } else {
+          console.log('Cloud and local data are identical — no conflict');
+          conflictResolved.current = true;
         }
       } else {
         console.log('Could not load from Gist, using local data');
+        conflictResolved.current = true;
       }
     };
 
@@ -39,11 +55,33 @@ export const useGistSync = (campaignsData, config, setSaveStatus, importData) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount
 
+  // User chose to keep local data (overwrite cloud on next auto-save)
+  const resolveKeepLocal = useCallback(() => {
+    console.log('User chose: Keep Local — cloud will be updated on next auto-save');
+    setSyncConflict(null);
+    conflictResolved.current = true;
+  }, []);
+
+  // User chose to use cloud data (replace local)
+  const resolveUseCloud = useCallback(() => {
+    if (syncConflict?.cloudData) {
+      console.log('User chose: Use Cloud — replacing local data');
+      importData(syncConflict.cloudData);
+    }
+    setSyncConflict(null);
+    conflictResolved.current = true;
+  }, [syncConflict, importData]);
+
   // Save to Gist whenever debounced data changes (except on initial mount)
   useEffect(() => {
     // Skip on initial mount
     if (isInitialMount.current) {
       isInitialMount.current = false;
+      return;
+    }
+
+    // Block auto-save until the user resolves any sync conflict
+    if (!conflictResolved.current) {
       return;
     }
 
@@ -124,7 +162,10 @@ export const useGistSync = (campaignsData, config, setSaveStatus, importData) =>
 
   return {
     manualSync,
-    manualLoad
+    manualLoad,
+    syncConflict,
+    resolveKeepLocal,
+    resolveUseCloud
   };
 };
 

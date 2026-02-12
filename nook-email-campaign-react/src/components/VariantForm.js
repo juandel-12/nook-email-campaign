@@ -396,9 +396,14 @@ const VariantForm = ({ campaignId, emailIndex, variant, onPushToAC }) => {
           <Label htmlFor="template">Email Template</Label>
           <select
             id="template"
-            value={PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate)?.id || 'custom'}
+            value={
+              PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate)?.id
+              || (config.customTemplates || []).find(t => t.html === config.htmlTemplate)?.id
+              || 'custom'
+            }
             onChange={(e) => {
-              const template = PREDEFINED_TEMPLATES.find(t => t.id === e.target.value);
+              const allTemplates = [...PREDEFINED_TEMPLATES, ...(config.customTemplates || [])];
+              const template = allTemplates.find(t => t.id === e.target.value);
               if (template) {
                 updateConfig({ htmlTemplate: template.html });
               }
@@ -408,7 +413,10 @@ const VariantForm = ({ campaignId, emailIndex, variant, onPushToAC }) => {
             {PREDEFINED_TEMPLATES.map(t => (
               <option key={t.id} value={t.id}>{t.name}</option>
             ))}
-            {!PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate) && (
+            {(config.customTemplates || []).map(t => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+            {!PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate) && !(config.customTemplates || []).find(t => t.html === config.htmlTemplate) && (
               <option value="custom">Custom</option>
             )}
           </select>
