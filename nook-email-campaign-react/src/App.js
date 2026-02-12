@@ -12,7 +12,13 @@ import CampaignModal from './components/CampaignModal';
 import ActiveCampaignPushModal from './components/ActiveCampaignPushModal';
 import EmailContent from './components/EmailContent';
 import { Button } from './components/ui/button';
-import { Plus } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './components/ui/dropdown-menu';
+import { Plus, MoreHorizontal } from 'lucide-react';
 import './App.css';
 
 const AppContent = () => {
@@ -28,6 +34,7 @@ const AppContent = () => {
     resetToDefaults,
     saveStatus,
     lastSaved,
+    updateCampaign,
   } = useCampaignContext();
 
   const [showSetupModal, setShowSetupModal] = useState(false);
@@ -35,7 +42,9 @@ const AppContent = () => {
   const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
   const [showAddEmailModal, setShowAddEmailModal] = useState(false);
   const [showACPushModal, setShowACPushModal] = useState(false);
-  const [acPushMode, setAcPushMode] = useState('bulk'); // 'bulk' | 'single'
+  const [acPushMode, setAcPushMode] = useState('single');
+  const [editingField, setEditingField] = useState(null); // null | 'name' | 'description'
+  const [editValue, setEditValue] = useState('');
 
   // Initialize Gist sync
   useGistSync(campaignsData, config, setSaveStatus, importData);
@@ -86,12 +95,7 @@ const AppContent = () => {
     }
   };
 
-  // ActiveCampaign push handlers
-  const handleBulkPushToAC = () => {
-    setAcPushMode('bulk');
-    setShowACPushModal(true);
-  };
-
+  // ActiveCampaign push handler (single email mode only)
   const handleSinglePushToAC = () => {
     setAcPushMode('single');
     setShowACPushModal(true);
@@ -99,6 +103,31 @@ const AppContent = () => {
 
   const campaign = getCurrentCampaign();
   const currentEmail = campaign?.emails[currentEmailIndex];
+
+  const startEditing = (field) => {
+    setEditingField(field);
+    setEditValue(field === 'name' ? campaign.name : campaign.description);
+  };
+
+  const finishEditing = () => {
+    if (editingField && campaign) {
+      const newName = editingField === 'name' ? editValue.trim() : campaign.name;
+      const newDesc = editingField === 'description' ? editValue.trim() : campaign.description;
+      if (newName) {
+        updateCampaign(currentCampaignId, newName, newDesc);
+      }
+    }
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const handleEditKeyDown = (e) => {
+    if (e.key === 'Enter') finishEditing();
+    if (e.key === 'Escape') {
+      setEditingField(null);
+      setEditValue('');
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -109,7 +138,6 @@ const AppContent = () => {
         onCopyAll={handleCopyAll}
         onReset={handleReset}
         onAddCampaign={() => setShowAddCampaignModal(true)}
-        onPushToAC={handleBulkPushToAC}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background">
@@ -119,11 +147,51 @@ const AppContent = () => {
             <div className="flex-1">
               {campaign && (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{campaign.name}</span>
+                  {editingField === 'name' ? (
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={finishEditing}
+                      onKeyDown={handleEditKeyDown}
+                      autoFocus
+                      className="text-sm font-medium bg-transparent border-b border-primary outline-none px-0 py-0"
+                    />
+                  ) : (
+                    <span className="text-sm font-medium">{campaign.name}</span>
+                  )}
                   <Separator orientation="vertical" className="h-4" />
-                  <span className="text-sm text-muted-foreground">
-                    {campaign.description}
-                  </span>
+                  {editingField === 'description' ? (
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={finishEditing}
+                      onKeyDown={handleEditKeyDown}
+                      autoFocus
+                      className="text-sm text-muted-foreground bg-transparent border-b border-primary outline-none px-0 py-0 flex-1"
+                    />
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      {campaign.description}
+                    </span>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <MoreHorizontal className="h-3 w-3" />
+                        <span className="sr-only">Campaign options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={() => startEditing('name')}>
+                        Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => startEditing('description')}>
+                        Update Description
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               )}
               {!campaign && (

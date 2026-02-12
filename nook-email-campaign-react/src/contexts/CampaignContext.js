@@ -160,14 +160,21 @@ export const CampaignProvider = ({ children }) => {
   }, []);
 
   const addEmail = useCallback((campaignId, dayNumber, title) => {
+    // Get existing variant keys from first email, or use default
+    const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
+    const existingVariantKeys = campaign?.emails?.[0]
+      ? Object.keys(campaign.emails[0].variants)
+      : ['generic'];
+
+    const variants = {};
+    existingVariantKeys.forEach(key => {
+      variants[key] = { subject: '', preview: '', body: '' };
+    });
+
     const newEmail = {
       day: parseInt(dayNumber, 10),
       title: title.trim(),
-      variants: {
-        flooring: { subject: '', preview: '', body: '' },
-        lighting: { subject: '', preview: '', body: '' },
-        generic: { subject: '', preview: '', body: '' }
-      }
+      variants
     };
 
     setCampaignsData(prev => ({
@@ -180,7 +187,6 @@ export const CampaignProvider = ({ children }) => {
     }));
 
     // Select the new email
-    const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
     if (campaign) {
       setCurrentEmailIndex(campaign.emails.length);
     }
@@ -202,19 +208,69 @@ export const CampaignProvider = ({ children }) => {
     }
   }, [currentEmailIndex]);
 
+  const addVariant = useCallback((campaignId, variantKey) => {
+    setCampaignsData(prev => ({
+      ...prev,
+      campaigns: prev.campaigns.map(c =>
+        c.id === campaignId
+          ? {
+              ...c,
+              emails: c.emails.map(email => ({
+                ...email,
+                variants: {
+                  ...email.variants,
+                  [variantKey]: { subject: '', preview: '', body: '' }
+                }
+              }))
+            }
+          : c
+      )
+    }));
+    setCurrentVariant(variantKey);
+  }, []);
+
+  const deleteVariant = useCallback((campaignId, variantKey) => {
+    setCampaignsData(prev => ({
+      ...prev,
+      campaigns: prev.campaigns.map(c =>
+        c.id === campaignId
+          ? {
+              ...c,
+              emails: c.emails.map(email => {
+                const { [variantKey]: removed, ...remainingVariants } = email.variants;
+                return { ...email, variants: remainingVariants };
+              })
+            }
+          : c
+      )
+    }));
+    // If we deleted the current variant, switch to first available
+    setCurrentVariant(prev => {
+      if (prev === variantKey) {
+        const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
+        if (campaign && campaign.emails.length > 0) {
+          const remaining = Object.keys(campaign.emails[0].variants).filter(k => k !== variantKey);
+          return remaining[0] || 'generic';
+        }
+        return 'generic';
+      }
+      return prev;
+    });
+  }, [campaignsData.campaigns]);
+
   const duplicateEmail = useCallback((campaignId, emailIndex) => {
     const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
     if (!campaign || !campaign.emails[emailIndex]) return;
 
     const emailToDuplicate = campaign.emails[emailIndex];
+    const duplicatedVariants = {};
+    Object.keys(emailToDuplicate.variants).forEach(key => {
+      duplicatedVariants[key] = { ...emailToDuplicate.variants[key] };
+    });
     const duplicatedEmail = {
       ...emailToDuplicate,
       title: `${emailToDuplicate.title} (Copy)`,
-      variants: {
-        flooring: { ...emailToDuplicate.variants.flooring },
-        lighting: { ...emailToDuplicate.variants.lighting },
-        generic: { ...emailToDuplicate.variants.generic }
-      }
+      variants: duplicatedVariants
     };
 
     setCampaignsData(prev => ({
@@ -407,6 +463,8 @@ export const CampaignProvider = ({ children }) => {
     updateEmail,
     updateEmailMeta,
     setCurrentVariant,
+    addVariant,
+    deleteVariant,
 
     // Data actions
     importData,

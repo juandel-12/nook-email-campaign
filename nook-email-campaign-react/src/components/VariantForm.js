@@ -6,8 +6,8 @@ import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCampaignContext } from '../contexts/CampaignContext';
-import { renderEmailTemplate, renderEmailTemplateRaw } from '../utils/emailTemplate';
-import { Copy, Check, Bold, Italic, Underline, Link as LinkIcon, Code, Undo, Redo, Variable } from 'lucide-react';
+import { renderEmailTemplate, renderEmailTemplateRaw, PREDEFINED_TEMPLATES } from '../utils/emailTemplate';
+import { Copy, Check, Bold, Italic, Underline, Link as LinkIcon, Code, Undo, Redo, Variable, Send } from 'lucide-react';
 import ColorPicker from './ColorPicker';
 import {
   DropdownMenu,
@@ -18,8 +18,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-const VariantForm = ({ campaignId, emailIndex, variant }) => {
-  const { campaignsData, config, updateEmail } = useCampaignContext();
+const VariantForm = ({ campaignId, emailIndex, variant, onPushToAC }) => {
+  const { campaignsData, config, updateEmail, updateConfig } = useCampaignContext();
   const [renderedHtml, setRenderedHtml] = useState('');
   const [rawHtml, setRawHtml] = useState('');
   const [copied, setCopied] = useState(false);
@@ -186,24 +186,27 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
       lastBodyValueRef.current = value;
     }
 
-    // Update history with debouncing (500ms)
-    clearTimeout(historyTimeoutRef.current[field]);
-    historyTimeoutRef.current[field] = setTimeout(() => {
-      setHistory(prev => {
-        const fieldHistory = prev[field];
-        // Only add to history if value changed
-        if (fieldHistory.present === value) return prev;
+    // Update history with debouncing (500ms) - only for fields that have history tracking
+    if (history[field]) {
+      clearTimeout(historyTimeoutRef.current[field]);
+      historyTimeoutRef.current[field] = setTimeout(() => {
+        setHistory(prev => {
+          const fieldHistory = prev[field];
+          if (!fieldHistory) return prev;
+          // Only add to history if value changed
+          if (fieldHistory.present === value) return prev;
 
-        return {
-          ...prev,
-          [field]: {
-            past: [...fieldHistory.past, fieldHistory.present],
-            present: value,
-            future: [] // Clear future when new change is made
-          }
-        };
-      });
-    }, 500);
+          return {
+            ...prev,
+            [field]: {
+              past: [...fieldHistory.past, fieldHistory.present],
+              present: value,
+              future: [] // Clear future when new change is made
+            }
+          };
+        });
+      }, 500);
+    }
 
     updateEmail(campaignId, emailIndex, variant, field, value);
   };
@@ -390,6 +393,31 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
       {/* Left column: Form fields */}
       <div className="space-y-6">
         <div className="grid w-full gap-3">
+          <Label htmlFor="template">Email Template</Label>
+          <select
+            id="template"
+            value={PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate)?.id || 'custom'}
+            onChange={(e) => {
+              const template = PREDEFINED_TEMPLATES.find(t => t.id === e.target.value);
+              if (template) {
+                updateConfig({ htmlTemplate: template.html });
+              }
+            }}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {PREDEFINED_TEMPLATES.map(t => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+            {!PREDEFINED_TEMPLATES.find(t => t.html === config.htmlTemplate) && (
+              <option value="custom">Custom</option>
+            )}
+          </select>
+          <p className="text-sm text-muted-foreground">
+            Choose the HTML email template for the preview and output
+          </p>
+        </div>
+
+        <div className="grid w-full gap-3">
           <div className="flex items-center justify-between">
             <Label htmlFor="subject">Subject Line</Label>
             <div className="flex gap-1">
@@ -464,6 +492,19 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
           />
           <p className="text-sm text-muted-foreground">
             Text shown next to the subject in the inbox
+          </p>
+        </div>
+
+        <div className="grid w-full gap-3">
+          <Label htmlFor="imageUrl">Image URL</Label>
+          <Input
+            id="imageUrl"
+            value={variantData.imageUrl || ''}
+            onChange={(e) => handleChange('imageUrl', e.target.value)}
+            placeholder="https://example.com/thumbnail.jpg"
+          />
+          <p className="text-sm text-muted-foreground">
+            Video thumbnail image URL for this variant
           </p>
         </div>
 
@@ -647,24 +688,36 @@ const VariantForm = ({ campaignId, emailIndex, variant }) => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label>Email Output</Label>
-          <Button
-            onClick={handleCopyHtml}
-            variant="outline"
-            size="sm"
-            disabled={copied}
-          >
-            {copied ? (
-              <>
-                <Check className="w-3 h-3 mr-1" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="w-3 h-3 mr-1" />
-                Copy HTML
-              </>
+          <div className="flex gap-2">
+            {onPushToAC && (
+              <Button
+                onClick={onPushToAC}
+                variant="outline"
+                size="sm"
+              >
+                <Send className="w-3 h-3 mr-1" />
+                Push to AC
+              </Button>
             )}
-          </Button>
+            <Button
+              onClick={handleCopyHtml}
+              variant="outline"
+              size="sm"
+              disabled={copied}
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3 h-3 mr-1" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copy HTML
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="preview" className="w-full">

@@ -10,12 +10,13 @@ const EmailContent = ({ campaignId, emailIndex, onPushToAC }) => {
 
   return (
     <div className={styles.emailContent}>
-      <EmailHeader campaignId={campaignId} emailIndex={emailIndex} onPushToAC={onPushToAC} />
+      <EmailHeader campaignId={campaignId} emailIndex={emailIndex} />
       <VariantTabs />
       <VariantForm
         campaignId={campaignId}
         emailIndex={emailIndex}
         variant={currentVariant}
+        onPushToAC={onPushToAC}
       />
     </div>
   );

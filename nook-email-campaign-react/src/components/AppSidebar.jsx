@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Mail, Plus, Download, Upload, Copy, RotateCcw, Github, Cloud, Send } from 'lucide-react';
+import { Mail, Plus, Download, Upload, Copy, RotateCcw, Github, Cloud } from 'lucide-react';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -27,7 +27,6 @@ export function AppSidebar({
   onCopyAll,
   onReset,
   onAddCampaign,
-  onPushToAC,
   ...props
 }) {
   const {
@@ -36,7 +35,6 @@ export function AppSidebar({
     currentEmailIndex,
     selectCampaign,
     selectEmail,
-    acSyncEnabled,
   } = useCampaignContext();
 
   return (
@@ -116,14 +114,6 @@ export function AppSidebar({
           <SidebarGroupLabel>Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {acSyncEnabled && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton onClick={onPushToAC}>
-                    <Send className="w-4 h-4" />
-                    <span>Push to ActiveCampaign</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={onOpenSetup}>
                   <Cloud className="w-4 h-4" />

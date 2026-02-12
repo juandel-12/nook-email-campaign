@@ -9,12 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { MoreVertical, Copy, Trash2, Send } from 'lucide-react';
+import { MoreVertical, Copy, Trash2 } from 'lucide-react';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './EmailHeader.module.css';
 
-const EmailHeader = ({ campaignId, emailIndex, onPushToAC }) => {
-  const { campaignsData, updateEmailMeta, deleteEmail, duplicateEmail, acSyncEnabled } = useCampaignContext();
+const EmailHeader = ({ campaignId, emailIndex }) => {
+  const { campaignsData, updateEmailMeta, deleteEmail, duplicateEmail } = useCampaignContext();
 
   const campaign = campaignsData.campaigns.find(c => c.id === campaignId);
   if (!campaign || !campaign.emails[emailIndex]) return null;
@@ -55,18 +55,6 @@ const EmailHeader = ({ campaignId, emailIndex, onPushToAC }) => {
               onChange={(e) => updateEmailMeta(campaignId, emailIndex, 'title', e.target.value)}
               placeholder="Email title for reference"
             />
-            {acSyncEnabled && onPushToAC && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onPushToAC}
-                title="Push this email to ActiveCampaign"
-                className="gap-1.5 flex-shrink-0"
-              >
-                <Send className="h-4 w-4" />
-                <span className="hidden sm:inline">Push to AC</span>
-              </Button>
-            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -74,15 +62,6 @@ const EmailHeader = ({ campaignId, emailIndex, onPushToAC }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {onPushToAC && (
-                  <>
-                    <DropdownMenuItem onClick={onPushToAC}>
-                      <Send className="mr-2 h-4 w-4" />
-                      Push to ActiveCampaign
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
                 <DropdownMenuItem onClick={handleDuplicate}>
                   <Copy className="mr-2 h-4 w-4" />
                   Duplicate Email

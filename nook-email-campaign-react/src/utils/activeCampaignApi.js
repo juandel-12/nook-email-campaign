@@ -236,6 +236,7 @@ export const pushEmailVariant = async (proxyUrl, acApiUrl, acApiKey, emailData, 
   // Convert newlines to <br> for the body, preserving existing HTML
   const bodyWithBreaks = (variantData.body || '').replace(/\n/g, '<br>');
   fullHtml = fullHtml.replace(/\{\{EMAIL_BODY\}\}/g, bodyWithBreaks);
+  fullHtml = fullHtml.replace(/\{\{IMAGE_URL\}\}/g, variantData.imageUrl || 'https://builtwithnook.activehosted.com/content/a2e1Ej/2026/02/06/41daa6c8-92b0-41c5-aa5b-fb3605945fb3.jpeg');
 
   const messageName = `${campaignName} - Day ${emailData.day} - ${variant.charAt(0).toUpperCase() + variant.slice(1)} - ${emailData.title}`;
 
