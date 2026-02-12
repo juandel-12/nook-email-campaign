@@ -5,12 +5,12 @@ import VariantForm from './VariantForm';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import styles from './EmailContent.module.css';
 
-const EmailContent = ({ campaignId, emailIndex }) => {
+const EmailContent = ({ campaignId, emailIndex, onPushToAC }) => {
   const { currentVariant } = useCampaignContext();
 
   return (
     <div className={styles.emailContent}>
-      <EmailHeader campaignId={campaignId} emailIndex={emailIndex} />
+      <EmailHeader campaignId={campaignId} emailIndex={emailIndex} onPushToAC={onPushToAC} />
       <VariantTabs />
       <VariantForm
         campaignId={campaignId}

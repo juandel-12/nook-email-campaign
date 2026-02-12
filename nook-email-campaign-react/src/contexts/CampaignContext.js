@@ -16,6 +16,9 @@ const LAST_SAVED_KEY = 'nookEmailCampaignLastSaved';
 const TOKEN_KEY = 'githubToken';
 const GIST_ID_KEY = 'gistId';
 const HTML_TEMPLATE_KEY = 'htmlEmailTemplate';
+const AC_API_URL_KEY = 'acApiUrl';
+const AC_API_KEY_KEY = 'acApiKey';
+const AC_PROXY_URL_KEY = 'acProxyUrl';
 
 export const CampaignProvider = ({ children }) => {
   // Core data state
@@ -29,7 +32,10 @@ export const CampaignProvider = ({ children }) => {
     gistId: localStorage.getItem(GIST_ID_KEY) || '',
     githubToken: localStorage.getItem(TOKEN_KEY) || '',
     htmlTemplate: localStorage.getItem(HTML_TEMPLATE_KEY) || DEFAULT_EMAIL_TEMPLATE,
-    saveDebounce: 2000
+    saveDebounce: 2000,
+    acApiUrl: localStorage.getItem(AC_API_URL_KEY) || '',
+    acApiKey: localStorage.getItem(AC_API_KEY_KEY) || '',
+    acProxyUrl: localStorage.getItem(AC_PROXY_URL_KEY) || ''
   });
 
   // Status state
@@ -281,6 +287,34 @@ export const CampaignProvider = ({ children }) => {
     });
   }, []);
 
+  // ActiveCampaign message ID tracking
+  const setAcMessageId = useCallback((campaignId, emailIndex, variant, messageId) => {
+    setCampaignsData(prev => ({
+      ...prev,
+      campaigns: prev.campaigns.map(c =>
+        c.id === campaignId
+          ? {
+              ...c,
+              emails: c.emails.map((email, i) =>
+                i === emailIndex
+                  ? {
+                      ...email,
+                      variants: {
+                        ...email.variants,
+                        [variant]: {
+                          ...email.variants[variant],
+                          acMessageId: messageId
+                        }
+                      }
+                    }
+                  : email
+              )
+            }
+          : c
+      )
+    }));
+  }, []);
+
   // Data import/export
   const importData = useCallback((jsonData) => {
     try {
@@ -328,6 +362,15 @@ export const CampaignProvider = ({ children }) => {
       if (newConfig.htmlTemplate !== undefined) {
         localStorage.setItem(HTML_TEMPLATE_KEY, newConfig.htmlTemplate);
       }
+      if (newConfig.acApiUrl !== undefined) {
+        localStorage.setItem(AC_API_URL_KEY, newConfig.acApiUrl);
+      }
+      if (newConfig.acApiKey !== undefined) {
+        localStorage.setItem(AC_API_KEY_KEY, newConfig.acApiKey);
+      }
+      if (newConfig.acProxyUrl !== undefined) {
+        localStorage.setItem(AC_PROXY_URL_KEY, newConfig.acProxyUrl);
+      }
 
       return updated;
     });
@@ -369,6 +412,7 @@ export const CampaignProvider = ({ children }) => {
     importData,
     exportData,
     resetToDefaults,
+    setAcMessageId,
 
     // Config
     config,
@@ -380,7 +424,8 @@ export const CampaignProvider = ({ children }) => {
     saveStatus,
     setSaveStatus,
     lastSaved,
-    cloudSyncEnabled: !!(config.gistId && config.githubToken)
+    cloudSyncEnabled: !!(config.gistId && config.githubToken),
+    acSyncEnabled: !!(config.acApiUrl && config.acApiKey && config.acProxyUrl)
   };
 
   return (

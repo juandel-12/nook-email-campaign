@@ -9,6 +9,7 @@ import StatusIndicator from './components/StatusIndicator';
 import SetupModal from './components/SetupModal';
 import ImportModal from './components/ImportModal';
 import CampaignModal from './components/CampaignModal';
+import ActiveCampaignPushModal from './components/ActiveCampaignPushModal';
 import EmailContent from './components/EmailContent';
 import { Button } from './components/ui/button';
 import { Plus } from 'lucide-react';
@@ -33,6 +34,8 @@ const AppContent = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
   const [showAddEmailModal, setShowAddEmailModal] = useState(false);
+  const [showACPushModal, setShowACPushModal] = useState(false);
+  const [acPushMode, setAcPushMode] = useState('bulk'); // 'bulk' | 'single'
 
   // Initialize Gist sync
   useGistSync(campaignsData, config, setSaveStatus, importData);
@@ -83,6 +86,17 @@ const AppContent = () => {
     }
   };
 
+  // ActiveCampaign push handlers
+  const handleBulkPushToAC = () => {
+    setAcPushMode('bulk');
+    setShowACPushModal(true);
+  };
+
+  const handleSinglePushToAC = () => {
+    setAcPushMode('single');
+    setShowACPushModal(true);
+  };
+
   const campaign = getCurrentCampaign();
   const currentEmail = campaign?.emails[currentEmailIndex];
 
@@ -95,6 +109,7 @@ const AppContent = () => {
         onCopyAll={handleCopyAll}
         onReset={handleReset}
         onAddCampaign={() => setShowAddCampaignModal(true)}
+        onPushToAC={handleBulkPushToAC}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background">
@@ -176,6 +191,7 @@ const AppContent = () => {
             <EmailContent
               campaignId={currentCampaignId}
               emailIndex={currentEmailIndex}
+              onPushToAC={handleSinglePushToAC}
             />
           )}
         </div>
@@ -187,6 +203,12 @@ const AppContent = () => {
         isOpen={showAddCampaignModal}
         onClose={() => setShowAddCampaignModal(false)}
         mode="add"
+      />
+      <ActiveCampaignPushModal
+        isOpen={showACPushModal}
+        onClose={() => setShowACPushModal(false)}
+        mode={acPushMode}
+        emailIndex={acPushMode === 'single' ? currentEmailIndex : null}
       />
       <AddEmailModal
         isOpen={showAddEmailModal}

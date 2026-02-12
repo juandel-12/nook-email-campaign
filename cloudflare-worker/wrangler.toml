@@ -1,0 +1,6 @@
+name = "nook-ac-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Free plan: 100,000 requests/day
+# Deploy with: npx wrangler deploy
