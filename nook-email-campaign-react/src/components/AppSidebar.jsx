@@ -171,6 +171,7 @@ export function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="px-3 pb-2 text-[10px] text-muted-foreground/50">v1.1.0</div>
       </SidebarFooter>
 
       <SidebarRail />
